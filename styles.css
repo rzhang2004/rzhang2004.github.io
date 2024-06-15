@@ -37,7 +37,7 @@ body {
     height: 200px;
     width: 40px;
     position: absolute;
-    left: 45px; /* to position the black keys between the white keys */
+    left: 40px; /* to position the black keys between the white keys */
     top: 0;
     z-index: 1;
 }
