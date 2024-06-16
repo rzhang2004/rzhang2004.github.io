@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     popupOverlay.appendChild(popupBox);
     document.body.appendChild(popupOverlay);
 
+    showPopup("Welcome to this piano game! The goal is to play back a random sequence of notes. You can specify the length of the sequence and restart attempts.")
+
     keys.forEach(key => {
         key.addEventListener('click', () => {
             playSound(key);
@@ -39,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             userInput = [];
             playSequence(lengthOfSequence);
         } else {
-            alert('Please enter a valid number for the length of the tune.');
+            showPopup('Please enter a valid number for the length of the tune.');
         }
     });
 

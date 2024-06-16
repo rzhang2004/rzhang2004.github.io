@@ -68,7 +68,7 @@ body {
     z-index: 10; /* Ensure overlay is above all other elements */
     visibility: hidden; /* Initially hidden */
     opacity: 0;
-    transition: opacity 0.3s, visibility 0.3s;
+    transition: opacity 0.2s, visibility 0.2s;
 }
 
 .popup-box {
@@ -79,6 +79,8 @@ body {
     width: 300px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     text-align: center;
+    transform: scale(0.7);
+    transition: transform 0.2s;
 }
 
 .popup-box .close-btn {
@@ -93,4 +95,8 @@ body {
 .popup-overlay.show {
     visibility: visible;
     opacity: 1;
+}
+
+.popup-overlay.show .popup-box {
+    transform: scale(1);
 }
