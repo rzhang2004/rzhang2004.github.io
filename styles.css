@@ -32,6 +32,10 @@ body {
     width: 60px;
 }
 
+.key.white:hover {
+    background:rgb(205, 205, 205);
+}
+
 .key.black {
     background: black;
     height: 200px;
@@ -40,6 +44,10 @@ body {
     left: 41px; /* to position the black keys between the white keys */
     top: 0;
     z-index: 1;
+}
+
+.key.black:hover {
+    background:rgb(38, 38, 38);
 }
 
 .text-container {
