@@ -3,51 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Piano</title>
+    <title>Portfolio</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    
-    <div class="piano-container">
-        <div class="key-container">
-            <div class="key white" data-note="C"></div>
-            <div class="key black" data-note="Csharp"></div>
-        </div>
-        <div class="key-container">
-            <div class="key white" data-note="D"></div>
-            <div class="key black" data-note="Dsharp"></div>
-        </div>
-        <div class="key-container">
-            <div class="key white" data-note="E"></div>
-        </div>
-        <div class="key-container">
-            <div class="key white" data-note="F"></div>
-            <div class="key black" data-note="Fsharp"></div>
-        </div>
-        <div class="key-container">
-            <div class="key white" data-note="G"></div>
-            <div class="key black" data-note="Gsharp"></div>
-        </div>
-        <div class="key-container">
-            <div class="key white" data-note="A"></div>
-            <div class="key black" data-note="Asharp"></div>
-        </div>
-        <div class="key-container">
-            <div class="key white" data-note="B"></div>
-        </div>
-        <div class="key-container">
-            <div class="key white" data-note="C2"></div>
-        </div>
+    <div class="content">
+        <section id="home">
+            <h2>Ray's Coding Portfolio</h2>
+            <p>I am an undergraduate student at Northwestern University pursuing a B.A. in Data Science and a B.M. in Viola Performance. My expected graduation date is Spring 2027.</p>
+        </section>
+        <section id="about">
+            <h2>About Me</h2>
+            <p>I have project experience working with Python, Java, HTML, CSS, Javascript, and R.</p>
+        </section>
+        <section id="projects">
+            <h2>Projects</h2>
+            <div class="project">
+                <a href="piano.html" target="_blank"><h3>Piano Game</h3></a>
+                <p>Built a piano game using HTML/CSS/Javascript to practice for Aural Skills, a required class that is part of my music degree plan.</p>
+            </div>
+            <!-- Repeat .project for more projects -->
+        </section>
+        <section id="contact">
+            <div class="contact-icons">
+                <a href="https://www.linkedin.com/in/ray-zhang-852a80312/" target="_blank">
+                    <img src="linkedin.jpg" alt="LinkedIn" class="contact-icon">
+                </a>
+                <a href="mailto:rayzhang2027@u.northwestern.edu" target="_blank">
+                    <img src="gmail.png" alt="Gmail" class="contact-icon">
+                </a>
+                <a href="https://github.com/rzhang2004" target="_blank">
+                    <img src="github.png" alt="GitHub" class="contact-icon">
+                </a>
+            </div>
+        </section>
     </div>
-
-    <div class="text-container">
-        <input type="text" placeholder="Length of Tune" class="show" id="length-value">
-        <br><br>  
-        <input type="submit" value="Play Tune" class="show" id="play-button">
-        <br><br>
-        <input type="submit" value="Restart Attempt" class="show" id="restart-button">
-    </div>
-
-    <script src="scripts.js"></script>
 </body>
 </html>

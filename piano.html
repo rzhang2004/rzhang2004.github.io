@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="pianostyles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piano Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    
+    <div class="piano-container">
+        <div class="key-container">
+            <div class="key white" data-note="C"></div>
+            <div class="key black" data-note="Csharp"></div>
+        </div>
+        <div class="key-container">
+            <div class="key white" data-note="D"></div>
+            <div class="key black" data-note="Dsharp"></div>
+        </div>
+        <div class="key-container">
+            <div class="key white" data-note="E"></div>
+        </div>
+        <div class="key-container">
+            <div class="key white" data-note="F"></div>
+            <div class="key black" data-note="Fsharp"></div>
+        </div>
+        <div class="key-container">
+            <div class="key white" data-note="G"></div>
+            <div class="key black" data-note="Gsharp"></div>
+        </div>
+        <div class="key-container">
+            <div class="key white" data-note="A"></div>
+            <div class="key black" data-note="Asharp"></div>
+        </div>
+        <div class="key-container">
+            <div class="key white" data-note="B"></div>
+        </div>
+        <div class="key-container">
+            <div class="key white" data-note="C2"></div>
+        </div>
+    </div>
+
+    <div class="text-container">
+        <input type="text" placeholder="Length of Tune" class="show" id="length-value">
+        <br><br>  
+        <input type="submit" value="Play Tune" class="show" id="play-button">
+        <br><br>
+        <input type="submit" value="Restart Attempt" class="show" id="restart-button">
+    </div>
+
+    <script src="pianoscripts.js"></script>
+</body>
+</html>
