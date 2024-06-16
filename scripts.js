@@ -5,7 +5,10 @@ let userInput = [];
 document.addEventListener('DOMContentLoaded', () => {
     const keys = document.querySelectorAll('.key');
     const playButton = document.getElementById('play-button');
+    const restartButton = document.getElementById('restart-button');
     const lengthInput = document.getElementById('length-value');
+
+    // Create popup elements
     const popupOverlay = document.createElement('div');
     const popupBox = document.createElement('div');
     const closeBtn = document.createElement('span');
@@ -13,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     popupOverlay.classList.add('popup-overlay');
     popupBox.classList.add('popup-box');
     closeBtn.classList.add('close-btn');
-
     closeBtn.innerHTML = '&times;';
     popupBox.appendChild(closeBtn);
     popupOverlay.appendChild(popupBox);
@@ -39,6 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             alert('Please enter a valid number for the length of the tune.');
         }
+    });
+
+    restartButton.addEventListener('click', () => {
+        userInput = [];
+        playSequence(generatedTune.length);
     });
 
     closeBtn.addEventListener('click', hidePopup);
@@ -86,8 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showPopup(message) {
-        popupBox.innerHTML = `${message}`;
-        popupBox.appendChild(closeBtn); // Reattach the close button
+        popupBox.innerHTML = `${message} <span class="close-btn">&times;</span>`;
+        const newCloseBtn = popupBox.querySelector('.close-btn');
+        newCloseBtn.addEventListener('click', hidePopup);
         popupOverlay.classList.add('show');
     }
 
@@ -103,44 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
         }
-        if (userInput.length === generatedTune.length) {
-            showPopup('Good Job!');
-        }
+        showPopup('Good Job!');
     }
-});
 
-document.addEventListener('DOMContentLoaded', () => {
-    const playButton = document.getElementById('play-button');
-    const popupOverlay = document.createElement('div');
-    const popupBox = document.createElement('div');
-    const closeBtn = document.createElement('span');
-    
-    popupOverlay.classList.add('popup-overlay');
-    popupBox.classList.add('popup-box');
-    closeBtn.classList.add('close-btn');
-    
-    closeBtn.innerHTML = '&times;';
-    popupBox.innerHTML = 'Play back the correct sequence of notes on the piano! (Rhythm does not matter)';
-    popupBox.appendChild(closeBtn);
-    popupOverlay.appendChild(popupBox);
-    document.body.appendChild(popupOverlay);
-    
-    playButton.addEventListener('click', () => {
-        popupOverlay.classList.add('show');
-    });
-
-    restartButton.addEventListener('click', () => {
-        userInput = [];
-        playSequence(generatedTune.length);
-    });
-    
-    closeBtn.addEventListener('click', () => {
-        popupOverlay.classList.remove('show');
-    });
-    
-    popupOverlay.addEventListener('click', (e) => {
-        if (e.target === popupOverlay) {
-            popupOverlay.classList.remove('show');
-        }
-    });
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 });
