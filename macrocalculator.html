@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Macro Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <form action="/submit" method="post">
+        <fieldset>
+            <legend>Macros and Calories</legend>
+            <label for="int1">Protein (g)</label>
+            <input type="number" id="int1" name="int1" required oninput="calculateCalories()">
+            <input type="range" id="slider1" name="slider1" min="0" max="1000" oninput="syncValue('slider1', 'int1'); calculateCalories();"><br><br>
+            
+            <label for="int2">Carbs (g)</label>
+            <input type="number" id="int2" name="int2" required oninput="calculateCalories()">
+            <input type="range" id="slider2" name="slider2" min="0" max="1000" oninput="syncValue('slider2', 'int2'); calculateCalories();"><br><br>
+            
+            <label for="int3">Fats (g)</label>
+            <input type="number" id="int3" name="int3" required oninput="calculateCalories()">
+            <input type="range" id="slider3" name="slider3" min="0" max="1000" oninput="syncValue('slider3', 'int3'); calculateCalories();"><br><br>
+            
+            <label for="int4">Calories</label>
+            <input type="number" id="int4" name="int4" required readonly><br><br>
+            
+            <label for="int5">Number of Meals</label>
+            <input type="number" id="int5" name="int5" required>
+            <input type="range" id="slider5" name="slider5" min="1" max="8" oninput="syncValue('slider5', 'int5')"><br><br>
+        </fieldset>
+        
+        <fieldset>
+            <legend>Meal Times</legend>
+            <label for="time1">First Meal</label>
+            <input type="time" id="time1" name="time1" required><br><br>
+            
+            <label for="time2">Last Meal</label>
+            <input type="time" id="time2" name="time2" required><br><br>
+        </fieldset>
+        
+        <fieldset>
+            <legend>Preferences</legend>
+            <label for="box1">Vegetarian</label>
+            <input type="checkbox" id="box1" name="box1"><br><br>
+            
+            <label for="box2">Whey</label>
+            <input type="checkbox" id="box2" name="box2"><br><br>
+            
+            <label for="box3">Avoid <a id="allergens" href="#">common allergens</a></label>
+            <input type="checkbox" id="box3" name="box3"><br><br>
+            
+            <label for="box4">Checkbox 4</label>
+            <input type="checkbox" id="box4" name="box4"><br><br>
+        </fieldset>
+        
+        <input type="submit" value="Submit">
+    </form>
+
+
+    <script src="macroscripts.js"></script>
+</body>
+</html>

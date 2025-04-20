@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note Frequency Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        label, input, button {
+            display: block;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Note Frequency Calculator</h1>
+    <form id="setA">
+        <label for="aF">A = (e.g., 440, 441, 442):</label>
+        <input type="text" id="aF" name="aF" required>
+    </form>
+    <form id="noteForm">
+        <label for="lowerNote">Lower Note (e.g., A4, C5):</label>
+        <input type="text" id="lowerNote" name="lowerNote" required>
+        
+        <label for="higherNote">Higher Note (e.g., A4, C5):</label>
+        <input type="text" id="higherNote" name="higherNote" required>
+        
+        <button type="submit">Calculate Frequencies</button>
+    </form>
+
+    <h2>Results</h2>
+    <p id="lowerFrequency">Lower Note Frequency (Hz): </p>
+    <p id="higherEqualFrequency">Higher Note Frequency (Equal Temperament) (Hz): </p>
+    <p id="higherJustFrequency">Higher Note Frequency (Just Intonation) (Hz): </p>
+    <p id="pitchDifference">Tuning Discrepancy (Hz): </p>
+
+    <script src="pitchscripts.js"></script>
+</body>
+</html>

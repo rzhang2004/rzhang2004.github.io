@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prime Form Calculator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .keyboard-container {
+            position: relative;
+            height: 200px;
+            margin: 30px 0;
+        }
+        
+        .white-keys {
+            display: flex;
+            height: 100%;
+            position: relative;
+        }
+        
+        .white-key {
+            flex: 1;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 0 0 5px 5px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .white-key.selected {
+            background-color: #a8d4ff;
+        }
+        
+        .black-keys {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            pointer-events: none;
+        }
+        
+        .black-key {
+            position: absolute;
+            width: 8%;
+            height: 100%;
+            background-color: #333;
+            border-radius: 0 0 3px 3px;
+            cursor: pointer;
+            z-index: 1;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            pointer-events: auto;
+        }
+        
+        .black-key.selected {
+            background-color: #5a7ebf;
+        }
+        
+        /* Position black keys correctly between white keys */
+        .black-key:nth-child(1) {
+            left: 9%;  /* Positioned between C and D */
+        }
+        
+        .black-key:nth-child(2) {
+            left: 21%; /* Positioned between D and E */
+        }
+        
+        .black-key:nth-child(3) {
+            left: 46%; /* Positioned between F and G */
+        }
+        
+        .black-key:nth-child(4) {
+            left: 59%; /* Positioned between G and A */
+        }
+        
+        .black-key:nth-child(5) {
+            left: 71%; /* Positioned between A and B */
+        }
+        
+        .key-label {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .black-key .key-label {
+            bottom: 5px;
+            color: white;
+            font-size: 10px;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin: 0 10px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .results h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .pitch-class-display {
+            font-family: monospace;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        
+        .explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9f7ef;
+            border-radius: 5px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Music Theory Prime Form Calculator</h1>
+    
+    <div class="toggle-container">
+        <span>Note Names</span>
+        <label class="toggle-switch">
+            <input type="checkbox" id="notation-toggle">
+            <span class="slider"></span>
+        </label>
+        <span>Numbers</span>
+    </div>
+    
+    <div class="keyboard-container">
+        <div class="white-keys">
+            <div class="white-key" data-note="0">
+                <div class="key-label">C</div>
+            </div>
+            <div class="white-key" data-note="2">
+                <div class="key-label">D</div>
+            </div>
+            <div class="white-key" data-note="4">
+                <div class="key-label">E</div>
+            </div>
+            <div class="white-key" data-note="5">
+                <div class="key-label">F</div>
+            </div>
+            <div class="white-key" data-note="7">
+                <div class="key-label">G</div>
+            </div>
+            <div class="white-key" data-note="9">
+                <div class="key-label">A</div>
+            </div>
+            <div class="white-key" data-note="11">
+                <div class="key-label">B</div>
+            </div>
+            <div class="white-key" data-note="0">
+                <div class="key-label">C</div>
+            </div>
+        </div>
+        <div class="black-keys">
+            <div class="black-key" data-note="1">
+                <div class="key-label">C#/Db</div>
+            </div>
+            <div class="black-key" data-note="3">
+                <div class="key-label">D#/Eb</div>
+            </div>
+            <div class="black-key" data-note="6">
+                <div class="key-label">F#/Gb</div>
+            </div>
+            <div class="black-key" data-note="8">
+                <div class="key-label">G#/Ab</div>
+            </div>
+            <div class="black-key" data-note="10">
+                <div class="key-label">A#/Bb</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button id="calculate">Calculate Prime Form</button>
+        <button id="reset">Reset Selection</button>
+    </div>
+    
+    <div class="results">
+        <h2>Results</h2>
+        <div>
+            <strong>Selected Notes:</strong> <span id="selected-notes">None</span>
+        </div>
+        <div>
+            <strong>Pitch Class Set:</strong> <span id="pitch-class-set">[ ]</span>
+        </div>
+        <div>
+            <strong>Normal Form:</strong> <span id="normal-form">[ ]</span>
+        </div>
+        <div>
+            <strong>Prime Form:</strong> <span id="prime-form">[ ]</span>
+        </div>
+    </div>
+    
+    <div class="explanation">
+        <h2>How It Works</h2>
+        <p>This calculator helps you find the prime form of a set of pitches in music theory:</p>
+        <ol>
+            <li>Click on the keyboard to select notes (click again to deselect)</li>
+            <li>Use the toggle switch to display note names or integer notation (0-11)</li>
+            <li>Click "Calculate Prime Form" to see the results</li>
+            <li>The pitch class set shows the integer notation (C=0, C#=1, etc.)</li>
+            <li>Normal form is the most compact arrangement starting with the smallest interval</li>
+            <li>Prime form is the most compact representation, transposed to start from 0</li>
+        </ol>
+        <p>Prime form is important in post-tonal theory as it allows us to identify set classes regardless of transposition or inversion.</p>
+    </div>
+
+    <script>
+        // Selected notes array (0-11 representing C through B)
+        let selectedNotes = [];
+        let useNumericalNotation = false;
+        const noteNames = ['C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B'];
+        
+        // Toggle between note names and numbers
+        document.getElementById('notation-toggle').addEventListener('change', function() {
+            useNumericalNotation = this.checked;
+            updateKeyboardLabels();
+            updateSelectedNotesDisplay();
+        });
+        
+        // Update keyboard labels based on notation choice
+        function updateKeyboardLabels() {
+            document.querySelectorAll('.white-key, .black-key').forEach(key => {
+                const noteValue = parseInt(key.getAttribute('data-note'));
+                const keyLabel = key.querySelector('.key-label');
+                
+                if (useNumericalNotation) {
+                    keyLabel.textContent = noteValue.toString();
+                } else {
+                    keyLabel.textContent = key.classList.contains('black-key') ? 
+                        noteNames[noteValue] : 
+                        noteNames[noteValue];
+                }
+            });
+        }
+        
+        // Add event listeners to all keys
+        document.querySelectorAll('.white-key, .black-key').forEach(key => {
+            key.addEventListener('click', () => {
+                const noteValue = parseInt(key.getAttribute('data-note'));
+                
+                // Toggle selection
+                const index = selectedNotes.indexOf(noteValue);
+                if (index > -1) {
+                    selectedNotes.splice(index, 1);
+                    key.classList.remove('selected');
+                } else {
+                    selectedNotes.push(noteValue);
+                    key.classList.add('selected');
+                }
+                
+                // Update display
+                updateSelectedNotesDisplay();
+            });
+        });
+        
+        // Reset button
+        document.getElementById('reset').addEventListener('click', () => {
+            selectedNotes = [];
+            document.querySelectorAll('.white-key, .black-key').forEach(key => {
+                key.classList.remove('selected');
+            });
+            updateSelectedNotesDisplay();
+            document.getElementById('normal-form').textContent = '[ ]';
+            document.getElementById('prime-form').textContent = '[ ]';
+        });
+        
+        // Calculate button
+        document.getElementById('calculate').addEventListener('click', () => {
+            if (selectedNotes.length === 0) {
+                alert('Please select at least one note.');
+                return;
+            }
+            
+            const normalForm = calculateNormalForm([...selectedNotes]);
+            const primeForm = calculatePrimeForm([...selectedNotes]);
+            
+            document.getElementById('normal-form').textContent = '[' + normalForm.join(', ') + ']';
+            document.getElementById('prime-form').textContent = '[' + primeForm.join(', ') + ']';
+        });
+        
+        // Update the display of selected notes
+        function updateSelectedNotesDisplay() {
+            if (selectedNotes.length === 0) {
+                document.getElementById('selected-notes').textContent = 'None';
+                document.getElementById('pitch-class-set').textContent = '[ ]';
+            } else {
+                // Sort notes for display
+                const sortedNotes = [...selectedNotes].sort((a, b) => a - b);
+                
+                let noteDisplay;
+                if (useNumericalNotation) {
+                    noteDisplay = sortedNotes.join(', ');
+                } else {
+                    noteDisplay = sortedNotes.map(note => noteNames[note]).join(', ');
+                }
+                
+                document.getElementById('selected-notes').textContent = noteDisplay;
+                document.getElementById('pitch-class-set').textContent = '[' + sortedNotes.join(', ') + ']';
+            }
+        }
+        
+        // Calculate normal form of a pitch class set
+        function calculateNormalForm(pcSet) {
+            if (pcSet.length <= 1) return pcSet;
+            
+            // Remove duplicates and sort
+            pcSet = [...new Set(pcSet)].sort((a, b) => a - b);
+            
+            let mostCompact = null;
+            let smallestInterval = Infinity;
+            
+            // Try all rotations to find the most compact form
+            for (let i = 0; i < pcSet.length; i++) {
+                const rotation = [...pcSet.slice(i), ...pcSet.slice(0, i).map(n => n + 12)];
+                const span = rotation[rotation.length - 1] - rotation[0];
+                
+                // If this rotation has a smaller span, it's more compact
+                if (span < smallestInterval) {
+                    smallestInterval = span;
+                    mostCompact = rotation;
+                } else if (span === smallestInterval) {
+                    // If span is equal, compare intervals from left to right
+                    let currentIsMoreCompact = false;
+                    
+                    for (let j = 1; j < rotation.length; j++) {
+                        const currentInterval = rotation[j] - rotation[0];
+                        const prevInterval = mostCompact[j] - mostCompact[0];
+                        
+                        if (currentInterval < prevInterval) {
+                            currentIsMoreCompact = true;
+                            break;
+                        } else if (currentInterval > prevInterval) {
+                            break;
+                        }
+                    }
+                    
+                    if (currentIsMoreCompact) {
+                        mostCompact = rotation;
+                    }
+                }
+            }
+            
+            // Normalize to standard range (0-11)
+            return mostCompact.map(note => note % 12);
+        }
+        
+        // Calculate prime form of a pitch class set
+        function calculatePrimeForm(pcSet) {
+            if (pcSet.length <= 1) return pcSet;
+            
+            // Calculate normal form
+            const normalForm = calculateNormalForm([...pcSet]);
+            
+            // Calculate the inversion of the normal form
+            const invertedSet = normalForm.map(pc => (12 - pc) % 12);
+            const invertedNormalForm = calculateNormalForm(invertedSet);
+            
+            // Compare normal form with its inversion to determine prime form
+            const originalTransposed = normalForm.map(n => (n - normalForm[0] + 12) % 12);
+            const invertedTransposed = invertedNormalForm.map(n => (n - invertedNormalForm[0] + 12) % 12);
+            
+            // Choose the more compact form between original and inverted
+            let useOriginal = true;
+            
+            for (let i = 1; i < Math.min(originalTransposed.length, invertedTransposed.length); i++) {
+                if (originalTransposed[i] < invertedTransposed[i]) {
+                    useOriginal = true;
+                    break;
+                } else if (originalTransposed[i] > invertedTransposed[i]) {
+                    useOriginal = false;
+                    break;
+                }
+            }
+            
+            // Return the prime form
+            return useOriginal ? originalTransposed : invertedTransposed;
+        }
+    </script>
+</body>
+</html>
