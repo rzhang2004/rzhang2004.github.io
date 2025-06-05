@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Music Quiz - Random Excerpt Guesser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .subtitle {
+            color: #cccccc;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        input[type="text"]:focus {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.02);
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        input[type="text"]::placeholder {
+            color: #aaaaaa;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn.success {
+            background: linear-gradient(45deg, #10b981, #059669);
+        }
+
+        .btn.danger {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+        }
+
+        .score-section {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .score-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .score-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .score-label {
+            font-size: 0.9em;
+            color: #cccccc;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .quiz-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+
+        .guess-input-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .guess-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 18px;
+            outline: none;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .guess-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .guess-input.correct {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .guess-input.incorrect {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 560px;
+            margin: 0 auto 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .video-info {
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .video-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #667eea;
+        }
+
+        .video-title.hidden {
+            filter: blur(8px);
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .video-channel {
+            color: #cccccc;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .excerpt-info {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .excerpt-info h4 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .play-btn {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            font-size: 28px;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .result-message {
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+
+        .result-message.correct {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 2px solid rgba(16, 185, 129, 0.5);
+        }
+
+        .result-message.incorrect {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 2px solid rgba(239, 68, 68, 0.5);
+        }
+
+        .api-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .api-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .api-key-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-family: monospace;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .status.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .status.info {
+            background: rgba(255, 255, 255, 0.1);
+            color: #cccccc;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #333;
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .instructions ol {
+            color: #cccccc;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .input-group, .guess-input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            input[type="text"], .guess-input {
+                min-width: auto;
+            }
+            
+            .score-section {
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🎵 Music Quiz</div>
+        <div class="subtitle">Test your music knowledge with random 5-second excerpts!</div>
+        
+        <div class="score-section">
+            <div class="score-item">
+                <div class="score-number" id="correctScore">0</div>
+                <div class="score-label">Correct</div>
+            </div>
+            <div class="score-item">
+                <div class="score-number" id="totalScore">0</div>
+                <div class="score-label">Total</div>
+            </div>
+            <div class="score-item">
+                <div class="score-number" id="accuracyScore">0%</div>
+                <div class="score-label">Accuracy</div>
+            </div>
+        </div>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="playlistUrl" placeholder="Paste YouTube playlist URL here...">
+                <button class="btn" id="loadBtn">
+                    <span id="loadBtnText">Load Playlist</span>
+                    <span id="loadSpinner" class="loading" style="display: none;"></span>
+                </button>
+            </div>
+            <button class="btn" id="startBtn" disabled>🎯 Start Quiz Round</button>
+        </div>
+
+        <div id="playlistInfo" style="display: none;"></div>
+
+        <div class="quiz-section" id="quizSection">
+            <div class="video-container">
+                <div id="player"></div>
+            </div>
+            
+            <div class="excerpt-info">
+                <h4>🎯 Listen to the 5-second excerpt and guess the song!</h4>
+                <p id="excerptTime">Playing 5 seconds starting at 0:00</p>
+            </div>
+
+            <div class="guess-input-group">
+                <input type="text" id="guessInput" class="guess-input" placeholder="Type your guess for the song title..." disabled>
+                <button class="btn" id="submitBtn" disabled>Submit Guess</button>
+            </div>
+
+            <div class="result-message" id="resultMessage"></div>
+            
+            <div class="video-info">
+                <div class="video-title hidden" id="videoTitle">Video Title</div>
+                <div class="video-channel" id="videoChannel">Channel Name</div>
+            </div>
+            
+            <div class="controls">
+                <button class="control-btn" id="replayBtn" title="Replay Excerpt">🔄</button>
+                <button class="control-btn play-btn" id="playPauseBtn" title="Play/Pause">▶</button>
+                <button class="control-btn" id="revealBtn" title="Reveal Answer">👁</button>
+                <button class="control-btn" id="nextRoundBtn" title="Next Round">⏭</button>
+            </div>
+        </div>
+
+        <div id="status"></div>
+
+        <div class="api-section">
+            <h3>🔧 YouTube Data API Setup (Optional - for live playlists)</h3>
+            <p style="color: #cccccc; margin-bottom: 15px;">
+                To use real YouTube playlists, you'll need a YouTube Data API key:
+            </p>
+            <input type="text" id="apiKey" class="api-key-input" placeholder="Enter your YouTube Data API key here...">
+            <button class="btn" id="saveApiBtn">Save API Key</button>
+            <p style="color: #888; font-size: 0.9em; margin-top: 10px;">
+                Get your free API key at: <a href="https://console.cloud.google.com" style="color: #667eea;">Google Cloud Console</a>
+            </p>
+        </div>
+
+        <div class="instructions">
+            <h3>🎯 How to Play:</h3>
+            <ol>
+                <li><strong>Load a playlist:</strong> Paste any YouTube playlist URL</li>
+                <li><strong>Start quiz:</strong> Click "Start Quiz Round" to begin</li>
+                <li><strong>Listen:</strong> You'll hear a random 5-second excerpt</li>
+                <li><strong>Guess:</strong> Type what you think the song title is</li>
+                <li><strong>Submit:</strong> See if you got it right and track your score!</li>
+                <li><strong>Continue:</strong> Start new rounds to keep practicing</li>
+            </ol>
+            <p style="margin-top: 15px; font-size: 0.9em; color: #888;">
+                <strong>Perfect for:</strong> Music theory classes, band practice, or just testing your music knowledge! 
+                The quiz is forgiving with partial matches and different spellings.
+            </p>
+        </div>
+    </div>
+
+    <!-- YouTube API Script -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        // Game state
+        let currentPlaylist = [];
+        let currentVideoIndex = 0;
+        let player = null;
+        let excerptStartTime = 0;
+        const excerptDuration = 5;
+        let excerptTimer = null;
+        let isPlaying = false;
+        let quizActive = false;
+        let currentGuess = '';
+        let correctAnswer = '';
+        let hasGuessed = false;
+        let apiKey = localStorage.getItem('yt_api_key') || '';
+        let ytApiReady = false;
+
+        // Score tracking
+        let correctGuesses = 0;
+        let totalGuesses = 0;
+
+        // DOM elements
+        const elements = {
+            loadBtn: document.getElementById('loadBtn'),
+            startBtn: document.getElementById('startBtn'),
+            submitBtn: document.getElementById('submitBtn'),
+            replayBtn: document.getElementById('replayBtn'),
+            playPauseBtn: document.getElementById('playPauseBtn'),
+            revealBtn: document.getElementById('revealBtn'),
+            nextRoundBtn: document.getElementById('nextRoundBtn'),
+            saveApiBtn: document.getElementById('saveApiBtn'),
+            playlistUrl: document.getElementById('playlistUrl'),
+            guessInput: document.getElementById('guessInput'),
+            apiKeyInput: document.getElementById('apiKey'),
+            status: document.getElementById('status'),
+            loadBtnText: document.getElementById('loadBtnText'),
+            loadSpinner: document.getElementById('loadSpinner'),
+            videoTitle: document.getElementById('videoTitle'),
+            videoChannel: document.getElementById('videoChannel'),
+            excerptTime: document.getElementById('excerptTime'),
+            resultMessage: document.getElementById('resultMessage'),
+            quizSection: document.getElementById('quizSection'),
+            playlistInfo: document.getElementById('playlistInfo')
+        };
+
+        // YouTube API Ready
+        function onYouTubeIframeAPIReady() {
+            ytApiReady = true;
+            console.log('YouTube API Ready');
+        }
+
+        // Initialize the app
+        function init() {
+            // Set up event listeners
+            elements.loadBtn.addEventListener('click', loadPlaylist);
+            elements.startBtn.addEventListener('click', startNewRound);
+            elements.submitBtn.addEventListener('click', submitGuess);
+            elements.replayBtn.addEventListener('click', replayExcerpt);
+            elements.playPauseBtn.addEventListener('click', togglePlayPause);
+            elements.revealBtn.addEventListener('click', revealAnswer);
+            elements.nextRoundBtn.addEventListener('click', startNewRound);
+            elements.saveApiBtn.addEventListener('click', saveApiKey);
+
+            elements.guessInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !elements.submitBtn.disabled) {
+                    submitGuess();
+                }
+            });
+
+            elements.playlistUrl.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    loadPlaylist();
+                }
+            });
+
+            elements.apiKeyInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    saveApiKey();
+                }
+            });
+
+            // Initialize API key if present
+            if (apiKey) {
+                elements.apiKeyInput.value = apiKey;
+                elements.apiKeyInput.style.borderColor = '#10b981';
+                elements.apiKeyInput.style.background = 'rgba(16, 185, 129, 0.1)';
+            }
+
+            updateScore();
+        }
+
+        function updateScore() {
+            document.getElementById('correctScore').textContent = correctGuesses;
+            document.getElementById('totalScore').textContent = totalGuesses;
+            const accuracy = totalGuesses > 0 ? Math.round((correctGuesses / totalGuesses) * 100) : 0;
+            document.getElementById('accuracyScore').textContent = accuracy + '%';
+        }
+
+        function showStatus(message, type = 'info') {
+            elements.status.innerHTML = message;
+            elements.status.className = `status ${type}`;
+            elements.status.style.display = 'block';
+            
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    elements.status.style.display = 'none';
+                }, 4000);
+            }
+        }
+
+        function showLoading(show) {
+            if (show) {
+                elements.loadBtnText.style.display = 'none';
+                elements.loadSpinner.style.display = 'inline-block';
+                elements.loadBtn.disabled = true;
+            } else {
+                elements.loadBtnText.style.display = 'inline';
+                elements.loadSpinner.style.display = 'none';
+                elements.loadBtn.disabled = false;
+            }
+        }
+
+        function extractPlaylistId(url) {
+            const regex = /(?:list=)([a-zA-Z0-9_-]+)/;
+            const match = url.match(regex);
+            return match ? match[1] : null;
+        }
+
+        function parseDuration(duration) {
+            const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+            let hours = 0, minutes = 0, seconds = 0;
+            
+            if (match[1]) hours = parseInt(match[1].slice(0, -1));
+            if (match[2]) minutes = parseInt(match[2].slice(0, -1));
+            if (match[3]) seconds = parseInt(match[3].slice(0, -1));
+            
+            return hours * 3600 + minutes * 60 + seconds;
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        function normalizeString(str) {
+            return str.toLowerCase()
+                     .replace(/[^\w\s]/g, '') // Remove punctuation
+                     .replace(/\s+/g, ' ')    // Normalize whitespace
+                     .trim();
+        }
+
+        function checkGuess(guess, answer) {
+            const normalizedGuess = normalizeString(guess);
+            const normalizedAnswer = normalizeString(answer);
+            
+            // Exact match
+            if (normalizedGuess === normalizedAnswer) return 100;
+            
+            // Contains check (partial match)
+            if (normalizedAnswer.includes(normalizedGuess) || normalizedGuess.includes(normalizedAnswer)) {
+                return 80;
+            }
+            
+            // Word-based similarity
+            const guessWords = normalizedGuess.split(' ');
+            const answerWords = normalizedAnswer.split(' ');
+            let matchingWords = 0;
+            
+            guessWords.forEach(word => {
+                if (word.length > 2 && answerWords.some(answerWord => 
+                    answerWord.includes(word) || word.includes(answerWord))) {
+                    matchingWords++;
+                }
+            });
+            
+            const similarity = (matchingWords / Math.max(guessWords.length, answerWords.length)) * 100;
+            return similarity > 50 ? similarity : 0;
+        }
+
+        async function loadPlaylist() {
+            const url = elements.playlistUrl.value.trim();
+            
+            if (!url) {
+                showStatus('Please enter a playlist URL', 'error');
+                return;
+            }
+
+            const playlistId = extractPlaylistId(url);
+            if (!playlistId) {
+                showStatus('Invalid YouTube playlist URL', 'error');
+                return;
+            }
+
+            showLoading(true);
+            showStatus('Loading playlist...', 'info');
+
+            try {
+                if (apiKey) {
+                    await loadRealPlaylist(playlistId);
+                } else {
+                    await simulatePlaylistLoad(playlistId);
+                }
+            } catch (error) {
+                showStatus('Failed to load playlist: ' + error.message, 'error');
+                showLoading(false);
+            }
+        }
+
+        async function loadRealPlaylist(playlistId) {
+            try {
+                // First fetch playlist items
+                const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${apiKey}`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error?.message || 'Failed to load playlist');
+                }
+
+                // Extract video IDs for duration lookup
+                const videoIds = data.items.map(item => item.snippet.resourceId.videoId);
+                
+                // Fetch video details including duration
+                const videosResponse = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&id=${videoIds.join(',')}&key=${apiKey}`);
+                const videosData = await videosResponse.json();
+                
+                if (!videosResponse.ok) {
+                    throw new Error(videosData.error?.message || 'Failed to load video details');
+                }
+
+                // Create video details map
+                const videoDetailsMap = {};
+                videosData.items.forEach(video => {
+                    videoDetailsMap[video.id] = {
+                        duration: parseDuration(video.contentDetails.duration),
+                        thumbnail: video.snippet.thumbnails?.high?.url
+                    };
+                });
+
+                // Combine data
+                const videos = data.items.map(item => ({
+                    id: item.snippet.resourceId.videoId,
+                    title: item.snippet.title,
+                    channel: item.snippet.channelTitle,
+                    duration: videoDetailsMap[item.snippet.resourceId.videoId]?.duration || 180,
+                    thumbnail: videoDetailsMap[item.snippet.resourceId.videoId]?.thumbnail
+                }));
+
+                currentPlaylist = videos;
+                showPlaylistInfo(`Real Playlist Loaded`, videos.length);
+                showLoading(false);
+                showStatus(`Loaded ${videos.length} videos successfully!`, 'success');
+                elements.startBtn.disabled = false;
+                
+            } catch (error) {
+                showStatus('API Error: ' + error.message + '. Using demo mode instead.', 'error');
+                await simulatePlaylistLoad(playlistId);
+            }
+        }
+
+        async function simulatePlaylistLoad(playlistId) {
+            // Simulate loading delay
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // Expanded sample playlist for music quiz
+            const samplePlaylist = [
+                {
+                    id: "dQw4w9WgXcQ",
+                    title: "Never Gonna Give You Up",
+                    channel: "Rick Astley",
+                    duration: 213
+                },
+                {
+                    id: "9jK-NcRmVcw",
+                    title: "The Final Countdown",
+                    channel: "Europe",
+                    duration: 311
+                },
+                {
+                    id: "hFcLyDb6niA",
+                    title: "Back In Black",
+                    channel: "AC/DC",
+                    duration: 255
+                },
+                {
+                    id: "fJ9rUzIMcZQ",
+                    title: "Bohemian Rhapsody",
+                    channel: "Queen",
+                    duration: 355
+                },
+                {
+                    id: "SlPhMPnQ58k",
+                    title: "Enjoy the Silence",
+                    channel: "Depeche Mode",
+                    duration: 267
+                },
+                {
+                    id: "rY0WxgSXdEE",
+                    title: "Sweet Child O' Mine",
+                    channel: "Guns N' Roses",
+                    duration: 356
+                },
+                {
+                    id: "CD-E-LDc384",
+                    title: "Sweet Caroline",
+                    channel: "Neil Diamond",
+                    duration: 201
+                },
+                {
+                    id: "tbU3zdAgiX8",
+                    title: "September",
+                    channel: "Earth, Wind & Fire",
+                    duration: 215
+                },
+                {
+                    id: "L_jWHffIx5E",
+                    title: "Smells Like Teen Spirit",
+                    channel: "Nirvana",
+                    duration: 301
+                },
+                {
+                    id: "kXYiU_JCYtU",
+                    title: "Livin' on a Prayer",
+                    channel: "Bon Jovi",
+                    duration: 249
+                }
+            ];
+
+            currentPlaylist = samplePlaylist;
+            showPlaylistInfo("Demo Music Quiz Playlist", samplePlaylist.length);
+            showLoading(false);
+            showStatus(`Loaded ${samplePlaylist.length} songs for quiz!`, 'success');
+            elements.startBtn.disabled = false;
+        }
+
+        function showPlaylistInfo(title, count) {
+            elements.playlistInfo.innerHTML = `
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div style="font-size: 1.2em; font-weight: bold; color: #667eea; margin-bottom: 5px;">${title}</div>
+                    <div style="color: #aaa; font-size: 0.9em;">${count} songs ready for quiz</div>
+                </div>
+            `;
+            elements.playlistInfo.style.display = 'block';
+        }
+
+        function startNewRound() {
+            if (currentPlaylist.length === 0) {
+                showStatus('No playlist loaded', 'error');
+                return;
+            }
+
+            // Reset quiz state
+            hasGuessed = false;
+            quizActive = true;
+            
+            // Reset UI
+            elements.guessInput.value = '';
+            elements.guessInput.className = 'guess-input';
+            elements.guessInput.disabled = false;
+            elements.submitBtn.disabled = false;
+            elements.resultMessage.style.display = 'none';
+            elements.videoTitle.classList.add('hidden');
+            elements.revealBtn.style.display = 'flex';
+
+            // Select random video and excerpt
+            currentVideoIndex = Math.floor(Math.random() * currentPlaylist.length);
+            const video = currentPlaylist[currentVideoIndex];
+            correctAnswer = video.title;
+
+            // Select random start time
+            const maxStartTime = Math.max(0, video.duration - excerptDuration - 10);
+            excerptStartTime = Math.floor(Math.random() * maxStartTime);
+
+            loadVideo(video);
+            elements.quizSection.style.display = 'block';
+            
+            showStatus(`🎵 New round started! Listen and guess...`, 'info');
+        }
+
+        function loadVideo(video) {
+            if (!ytApiReady) {
+                showStatus('YouTube API is still loading. Please try again.', 'error');
+                return;
+            }
+
+            // Update video info
+            elements.videoTitle.textContent = video.title;
+            elements.videoChannel.textContent = video.channel;
+            elements.excerptTime.textContent = `Playing 5 seconds starting at ${formatTime(excerptStartTime)}`;
+
+            // Create or update YouTube player
+            if (player) {
+                player.loadVideoById({
+                    videoId: video.id,
+                    startSeconds: excerptStartTime
+                });
+            } else {
+                player = new YT.Player('player', {
+                    height: '315',
+                    width: '560',
+                    videoId: video.id,
+                    playerVars: {
+                        'start': excerptStartTime,
+                        'autoplay': 1,
+                        'controls': 1,
+                        'rel': 0,
+                        'modestbranding': 1
+                    },
+                    events: {
+                        'onReady': onPlayerReady,
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+            }
+        }
+
+        function onPlayerReady(event) {
+            startExcerptTimer();
+        }
+
+        function onPlayerStateChange(event) {
+            const playBtn = elements.playPauseBtn;
+            
+            try {
+                if (event.data === YT.PlayerState.PLAYING) {
+                    playBtn.textContent = '⏸';
+                    isPlaying = true;
+                    if (quizActive) startExcerptTimer();
+                } else if (event.data === YT.PlayerState.PAUSED) {
+                    playBtn.textContent = '▶';
+                    isPlaying = false;
+                    clearTimeout(excerptTimer);
+                } else if (event.data === YT.PlayerState.ENDED) {
+                    playBtn.textContent = '▶';
+                    isPlaying = false;
+                    clearTimeout(excerptTimer);
+                } else if (event.data === YT.PlayerState.ERROR) {
+                    showStatus('Error playing video. Trying next song...', 'error');
+                    setTimeout(startNewRound, 2000);
+                }
+            } catch (e) {
+                console.error('Player state error:', e);
+            }
+        }
+
+        function startExcerptTimer() {
+            clearTimeout(excerptTimer);
+            excerptTimer = setTimeout(() => {
+                if (player && isPlaying && quizActive) {
+                    player.pauseVideo();
+                    showStatus('🎯 Time to guess! What song was that?', 'info');
+                }
+            }, excerptDuration * 1000);
+        }
+
+        function saveApiKey() {
+            const key = elements.apiKeyInput.value.trim();
+            
+            if (!key) {
+                showStatus('Please enter an API key', 'error');
+                return;
+            }
+            
+            // Basic validation (YouTube API keys are typically 39 characters)
+            if (key.length < 30) {
+                showStatus('API key seems too short. Please check and try again.', 'error');
+                return;
+            }
+            
+            apiKey = key;
+            localStorage.setItem('yt_api_key', key);
+            showStatus('API key saved! You can now load real YouTube playlists.', 'success');
+            
+            // Visual feedback
+            elements.apiKeyInput.style.borderColor = '#10b981';
+            elements.apiKeyInput.style.background = 'rgba(16, 185, 129, 0.1)';
+        }
+
+        function togglePlayPause() {
+            if (!player) return;
+            
+            if (isPlaying) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+            }
+        }
+
+        function replayExcerpt() {
+            if (!player || !quizActive) return;
+            
+            player.seekTo(excerptStartTime, true);
+            player.playVideo();
+            startExcerptTimer();
+            showStatus('🔄 Replaying excerpt...', 'info');
+        }
+
+        function revealAnswer() {
+            if (!quizActive) return;
+            
+            elements.videoTitle.classList.remove('hidden');
+            elements.revealBtn.style.display = 'none';
+            quizActive = false;
+            
+            if (player) {
+                player.seekTo(0, true);
+                player.playVideo();
+            }
+            
+            showStatus('📝 Answer revealed! Click "Next Round" to continue.', 'info');
+        }
+
+        function submitGuess() {
+            if (hasGuessed) return;
+            
+            const guess = elements.guessInput.value.trim();
+            if (!guess) {
+                showStatus('Please enter your guess!', 'error');
+                return;
+            }
+            
+            hasGuessed = true;
+            quizActive = false;
+            totalGuesses++;
+            
+            const similarity = checkGuess(guess, correctAnswer);
+            const resultMessage = elements.resultMessage;
+            
+            if (similarity >= 80) {
+                correctGuesses++;
+                elements.guessInput.classList.add('correct');
+                resultMessage.innerHTML = `
+                    <div>🎉 Correct! Great job!</div>
+                    <div style="font-size: 0.9em; margin-top: 10px;">
+                        Your guess: "${guess}"<br>
+                        Actual title: "${correctAnswer}"
+                    </div>
+                `;
+                resultMessage.className = 'result-message correct';
+                showStatus('🎉 Correct answer! Well done!', 'success');
+            } else if (similarity >= 50) {
+                correctGuesses += 0.5; // Partial credit
+                elements.guessInput.classList.add('correct');
+                resultMessage.innerHTML = `
+                    <div>✨ Close enough! Partial credit!</div>
+                    <div style="font-size: 0.9em; margin-top: 10px;">
+                        Your guess: "${guess}"<br>
+                        Actual title: "${correctAnswer}"
+                    </div>
+                `;
+                resultMessage.className = 'result-message correct';
+                showStatus('✨ Close enough! Partial credit awarded!', 'success');
+            } else {
+                elements.guessInput.classList.add('incorrect');
+                resultMessage.innerHTML = `
+                    <div>❌ Not quite right</div>
+                    <div style="font-size: 0.9em; margin-top: 10px;">
+                        Your guess: "${guess}"<br>
+                        Actual title: "${correctAnswer}"
+                    </div>
+                `;
+                resultMessage.className = 'result-message incorrect';
+                showStatus('❌ Not quite right. Try again next round!', 'error');
+            }
+            
+            resultMessage.style.display = 'block';
+            elements.guessInput.disabled = true;
+            elements.submitBtn.disabled = true;
+            elements.videoTitle.classList.remove('hidden');
+            elements.revealBtn.style.display = 'none';
+            
+            updateScore();
+            
+            // Allow full video playback
+            if (player) {
+                clearTimeout(excerptTimer);
+                player.seekTo(0, true);
+                player.playVideo();
+            }
+            
+            setTimeout(() => {
+                showStatus('🎵 Ready for next round? Click "Next Round" to continue!', 'info');
+            }, 3000);
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
