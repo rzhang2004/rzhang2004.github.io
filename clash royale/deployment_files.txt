@@ -1,0 +1,58 @@
+# .env (for local development - DO NOT COMMIT TO GITHUB)
+CLASH_ROYALE_API_KEY=your_clash_royale_api_key_here
+HF_TOKEN=your_huggingface_token_here
+
+# .env.example (commit this to show what environment variables are needed)
+CLASH_ROYALE_API_KEY=your_clash_royale_api_key_here
+HF_TOKEN=your_huggingface_token_here
+
+# .gitignore
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.env
+*.log
+.DS_Store
+
+# Procfile (for Heroku)
+web: gunicorn app:app
+
+# railway.toml (for Railway)
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+
+# render.yaml (for Render)
+services:
+  - type: web
+    name: clash-royale-analyzer
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: CLASH_ROYALE_API_KEY
+        sync: false
+      - key: HF_TOKEN
+        sync: false

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clash Royale AI Battle Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .input-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .input-field {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .analyze-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .analyze-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-left: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: #333;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .insights-section {
+            margin-top: 30px;
+        }
+
+        .insights-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .insights-content {
+            background: #f8f9ff;
+            border: 1px solid #e0e6ff;
+            border-radius: 15px;
+            padding: 25px;
+            line-height: 1.8;
+            color: #444;
+            white-space: pre-wrap;
+        }
+
+        .error {
+            background: #ff6b6b;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .api-info {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #1565c0;
+        }
+
+        .api-info a {
+            color: #1565c0;
+            font-weight: 600;
+        }
+
+        .feature-highlight {
+            background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .feature-highlight h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        .feature-highlight p {
+            color: #388e3c;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Clash Royale AI Analyzer</h1>
+            <p>Advanced battle analysis powered by machine learning & AI insights</p>
+        </div>
+
+        <div class="feature-highlight">
+            <h3>🧠 AI-Powered Analysis</h3>
+            <p>Uses logistic regression and large language models to provide personalized gameplay insights</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="playerTag">Player Tag (without #)</label>
+                    <input type="text" id="playerTag" placeholder="e.g., CR088L9L" />
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <button class="analyze-btn" onclick="analyzeBattles()">🔍 Analyze My Battles</button>
+            </div>
+            <div class="api-info">
+                <strong>How it works:</strong> Simply enter your player tag - no API key needed! 
+                We analyze your recent battles using machine learning to identify patterns that affect your win rate, 
+                then use AI to generate personalized strategic recommendations.
+                <br><br>
+                <strong>Privacy:</strong> We don't store your data. Analysis happens in real-time and results are not saved.
+            </div>
+        </div>
+
+        <div class="error" id="error">
+            <!-- Error messages will appear here -->
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>🔬 Running machine learning analysis...<br>
+            📊 Processing battle data...<br>
+            🤖 Generating AI insights...</p>
+        </div>
+
+        <div class="results" id="results">
+            <div class="stats-grid" id="statsGrid">
+                <!-- Battle stats will be inserted here -->
+            </div>
+
+            <div class="insights-section">
+                <h3>🎯 AI-Generated Strategic Insights</h3>
+                <div class="insights-content" id="insights">
+                    <!-- AI insights will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function analyzeBattles() {
+            const playerTag = document.getElementById('playerTag').value.trim();
+            
+            if (!playerTag) {
+                showError('Please enter your player tag');
+                return;
+            }
+
+            hideError();
+            showLoading(true);
+            hideResults();
+            
+            const analyzeBtn = document.querySelector('.analyze-btn');
+            analyzeBtn.disabled = true;
+            analyzeBtn.textContent = '⚡ Analyzing...';
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        player_tag: playerTag
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Analysis failed');
+                }
+
+                displayResults(data);
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                showLoading(false);
+                analyzeBtn.disabled = false;
+                analyzeBtn.textContent = '🔍 Analyze My Battles';
+            }
+        }
+
+        function displayResults(data) {
+            const { battle_stats, insights, features_analyzed } = data;
+            
+            // Display battle statistics
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${battle_stats.win_rate.toFixed(1)}%</div>
+                    <div class="stat-label">Win Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${battle_stats.total_battles}</div>
+                    <div class="stat-label">Battles Analyzed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${battle_stats.wins}</div>
+                    <div class="stat-label">Wins</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${battle_stats.losses}</div>
+                    <div class="stat-label">Losses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${battle_stats.avg_trophy_diff.toFixed(0)}</div>
+                    <div class="stat-label">Avg Trophy Gap</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${features_analyzed}</div>
+                    <div class="stat-label">Features Analyzed</div>
+                </div>
+            `;
+            
+            // Display AI insights
+            document.getElementById('insights').textContent = insights;
+            
+            showResults();
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showResults() {
+            document.getElementById('results').style.display = 'block';
+        }
+
+        function hideResults() {
+            document.getElementById('results').style.display = 'none';
+        }
+
+        // Add enter key support
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                analyzeBattles();
+            }
+        });
+
+        // Auto-focus on player tag input
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('playerTag').focus();
+        });
+    </script>
+</body>
+</html>
