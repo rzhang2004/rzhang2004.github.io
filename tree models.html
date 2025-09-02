@@ -1,0 +1,2938 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.549">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Import and read data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="tree models_files/libs/clipboard/clipboard.min.js"></script>
+<script src="tree models_files/libs/quarto-html/quarto.js"></script>
+<script src="tree models_files/libs/quarto-html/popper.min.js"></script>
+<script src="tree models_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="tree models_files/libs/quarto-html/anchor.min.js"></script>
+<link href="tree models_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="tree models_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="tree models_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="tree models_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="tree models_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Import and read data</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="import-and-read-data" class="level1">
+<h1>Import and read data</h1>
+<div id="2f3a1c5d-31fb-466d-b07e-c67380cd8409" class="cell" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lightgbm <span class="im">import</span> LGBMClassifier</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> roc_auc_score</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> GridSearchCV</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> optuna</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> lightgbm <span class="im">as</span> lgb</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> StratifiedKFold</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score, roc_auc_score</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="bb0f5d76-09b3-4b56-b41c-11ac872e5b8e" class="cell" data-execution_count="39">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> pd.read_csv(<span class="st">'x_FE.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="5639e1a8-aed2-4f1f-85a2-635d732ab591" class="cell" data-execution_count="40">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> pd.read_csv(<span class="st">'train.csv'</span>)[<span class="st">'y'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="tuning-process---lgbm" class="level1">
+<h1>Tuning process - LGBM</h1>
+<div id="3543717f-6cc2-426b-97fc-ba8281d3f22f" class="cell" data-scrolled="true" data-execution_count="50">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> optuna</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> lightgbm <span class="im">as</span> lgb</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> StratifiedKFold</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score, roc_auc_score</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> objective(trial):</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    param <span class="op">=</span> {</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"objective"</span>: <span class="st">"binary"</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"metric"</span>: <span class="st">"auc"</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"boosting_type"</span>: <span class="st">"gbdt"</span>,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"n_estimators"</span>: <span class="dv">10000</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"learning_rate"</span>: trial.suggest_float(<span class="st">"learning_rate"</span>, <span class="fl">0.01</span>, <span class="fl">0.06</span>, log<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"num_leaves"</span>: trial.suggest_int(<span class="st">"num_leaves"</span>, <span class="dv">140</span>, <span class="dv">200</span>),</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"max_depth"</span>: trial.suggest_int(<span class="st">"max_depth"</span>, <span class="dv">12</span>, <span class="dv">15</span>),</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"subsample"</span>: trial.suggest_float(<span class="st">"subsample"</span>, <span class="fl">0.55</span>, <span class="fl">0.75</span>),</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"colsample_bytree"</span>: trial.suggest_float(<span class="st">"colsample_bytree"</span>, <span class="fl">0.50</span>, <span class="fl">0.65</span>),</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"reg_alpha"</span>: trial.suggest_float(<span class="st">"reg_alpha"</span>, <span class="fl">1e-8</span>, <span class="fl">1e-5</span>, log<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"reg_lambda"</span>: trial.suggest_float(<span class="st">"reg_lambda"</span>, <span class="fl">1.0</span>, <span class="fl">10.0</span>),</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"verbose"</span>: <span class="op">-</span><span class="dv">1</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># StratifiedKFold for binary classification</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    kf <span class="op">=</span> StratifiedKFold(n_splits<span class="op">=</span><span class="dv">5</span>, shuffle<span class="op">=</span><span class="va">True</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    acc_scores <span class="op">=</span> []</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    auc_scores <span class="op">=</span> []</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> train_idx, valid_idx <span class="kw">in</span> kf.split(X, y):</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        X_train, X_valid <span class="op">=</span> X.iloc[train_idx], X.iloc[valid_idx]</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>        y_train, y_valid <span class="op">=</span> y.iloc[train_idx], y.iloc[valid_idx]</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>        gbm <span class="op">=</span> lgb.train(</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>            param,</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>            lgb.Dataset(X_train, y_train),</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>            valid_sets<span class="op">=</span>[lgb.Dataset(X_valid, y_valid)],</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>            callbacks<span class="op">=</span>[lgb.early_stopping(<span class="dv">100</span>)]</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Predict</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>        y_pred_proba <span class="op">=</span> gbm.predict(X_valid, num_iteration<span class="op">=</span>gbm.best_iteration)</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>        y_pred <span class="op">=</span> (y_pred_proba <span class="op">&gt;</span> <span class="fl">0.5</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>        acc_scores.append(accuracy_score(y_valid, y_pred))</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>        auc_scores.append(roc_auc_score(y_valid, y_pred_proba))</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Store mean AUC in user attrs</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>    mean_auc <span class="op">=</span> np.mean(auc_scores)</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>    trial.set_user_attr(<span class="st">"mean_auc"</span>, mean_auc)</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Optuna will optimize for accuracy here (you can switch to AUC if you prefer)</span></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.mean(acc_scores)</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="co"># Run Optuna study</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> optuna.create_study(direction<span class="op">=</span><span class="st">"maximize"</span>, sampler<span class="op">=</span>optuna.samplers.TPESampler())</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>study.optimize(objective, n_trials<span class="op">=</span><span class="dv">50</span>)</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Best parameters:"</span>, study.best_params)</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Best validation accuracy:"</span>, study.best_value)</span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Best validation AUC:"</span>, study.best_trial.user_attrs[<span class="st">"mean_auc"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[I 2025-08-28 18:22:45,186] A new study created in memory with name: no-name-f879bc3d-d705-441a-a6d4-b3f83b41c026
+[I 2025-08-28 18:38:18,530] Trial 0 finished with value: 0.9469386666666667 and parameters: {'learning_rate': 0.012140793943624547, 'num_leaves': 173, 'max_depth': 14, 'subsample': 0.618967903329197, 'colsample_bytree': 0.6246577246287145, 'reg_alpha': 5.519721933255015e-07, 'reg_lambda': 3.2529683463226347}. Best is trial 0 with value: 0.9469386666666667.
+[I 2025-08-28 18:43:28,431] Trial 1 finished with value: 0.9468466666666666 and parameters: {'learning_rate': 0.03701241942900884, 'num_leaves': 140, 'max_depth': 15, 'subsample': 0.6635026924497429, 'colsample_bytree': 0.6005379979233878, 'reg_alpha': 2.4288284633724475e-06, 'reg_lambda': 3.459772084472072}. Best is trial 0 with value: 0.9469386666666667.
+[I 2025-08-28 18:53:11,247] Trial 2 finished with value: 0.94694 and parameters: {'learning_rate': 0.02183059443446432, 'num_leaves': 145, 'max_depth': 12, 'subsample': 0.7482448685748735, 'colsample_bytree': 0.541904453181902, 'reg_alpha': 2.8368534217674508e-08, 'reg_lambda': 6.022758663519781}. Best is trial 2 with value: 0.94694.
+[I 2025-08-28 19:09:16,466] Trial 3 finished with value: 0.9471146666666665 and parameters: {'learning_rate': 0.012991339644410852, 'num_leaves': 198, 'max_depth': 12, 'subsample': 0.6766971652590743, 'colsample_bytree': 0.5055044831326581, 'reg_alpha': 1.1714015486170453e-08, 'reg_lambda': 4.010916144249192}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 19:21:05,624] Trial 4 finished with value: 0.9469520000000001 and parameters: {'learning_rate': 0.015048235972308897, 'num_leaves': 158, 'max_depth': 13, 'subsample': 0.6752098730675108, 'colsample_bytree': 0.6231062797569366, 'reg_alpha': 1.5783234816944506e-08, 'reg_lambda': 3.7918412585957944}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 19:30:16,829] Trial 5 finished with value: 0.9470666666666666 and parameters: {'learning_rate': 0.021926995917099183, 'num_leaves': 197, 'max_depth': 15, 'subsample': 0.6463787604538891, 'colsample_bytree': 0.61823278487445, 'reg_alpha': 7.19046482854767e-08, 'reg_lambda': 8.55447025174799}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 19:36:42,134] Trial 6 finished with value: 0.946932 and parameters: {'learning_rate': 0.03639736604185225, 'num_leaves': 178, 'max_depth': 13, 'subsample': 0.5775922978374355, 'colsample_bytree': 0.5174906697611029, 'reg_alpha': 4.8973104050599675e-08, 'reg_lambda': 3.9176176508352434}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 19:41:45,940] Trial 7 finished with value: 0.9467319999999999 and parameters: {'learning_rate': 0.04797087121443172, 'num_leaves': 159, 'max_depth': 12, 'subsample': 0.7457878884269291, 'colsample_bytree': 0.5648882741751726, 'reg_alpha': 2.864026393824164e-07, 'reg_lambda': 8.724283238135502}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 19:51:49,259] Trial 8 finished with value: 0.947016 and parameters: {'learning_rate': 0.021172153276954226, 'num_leaves': 174, 'max_depth': 13, 'subsample': 0.6194612645537713, 'colsample_bytree': 0.5227099559298211, 'reg_alpha': 1.8573336419586752e-08, 'reg_lambda': 5.809794476164321}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 20:01:48,601] Trial 9 finished with value: 0.9468586666666667 and parameters: {'learning_rate': 0.017670456676255185, 'num_leaves': 184, 'max_depth': 12, 'subsample': 0.6779892574786761, 'colsample_bytree': 0.6322962599128968, 'reg_alpha': 8.406698636238294e-07, 'reg_lambda': 3.9488767520274233}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 20:19:38,988] Trial 10 finished with value: 0.9470453333333333 and parameters: {'learning_rate': 0.01043789626080914, 'num_leaves': 200, 'max_depth': 14, 'subsample': 0.7115776969118027, 'colsample_bytree': 0.50170689793157, 'reg_alpha': 7.975294424848394e-06, 'reg_lambda': 1.2487816134099425}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 20:27:05,358] Trial 11 finished with value: 0.9468746666666666 and parameters: {'learning_rate': 0.02769394359856875, 'num_leaves': 198, 'max_depth': 15, 'subsample': 0.614984493134441, 'colsample_bytree': 0.587396905506592, 'reg_alpha': 8.170659396019006e-08, 'reg_lambda': 8.656539854399764}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 20:40:01,054] Trial 12 finished with value: 0.9468840000000001 and parameters: {'learning_rate': 0.014708155988881581, 'num_leaves': 187, 'max_depth': 14, 'subsample': 0.7060762844799061, 'colsample_bytree': 0.6487381094447464, 'reg_alpha': 1.4805071158740953e-07, 'reg_lambda': 9.907739346784194}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 20:47:40,506] Trial 13 finished with value: 0.9469506666666666 and parameters: {'learning_rate': 0.026945775582109675, 'num_leaves': 192, 'max_depth': 15, 'subsample': 0.6418761946554775, 'colsample_bytree': 0.5603847545085829, 'reg_alpha': 1.2678001560588103e-08, 'reg_lambda': 6.967959192119788}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 20:58:51,666] Trial 14 finished with value: 0.9468639999999999 and parameters: {'learning_rate': 0.01697682427102049, 'num_leaves': 191, 'max_depth': 14, 'subsample': 0.566737897557717, 'colsample_bytree': 0.5936969181842544, 'reg_alpha': 6.716952425908526e-08, 'reg_lambda': 7.43713671990846}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 21:15:22,505] Trial 15 finished with value: 0.9469813333333335 and parameters: {'learning_rate': 0.011511511286902882, 'num_leaves': 162, 'max_depth': 13, 'subsample': 0.6986197537819152, 'colsample_bytree': 0.5459043397899195, 'reg_alpha': 1.599694042417268e-07, 'reg_lambda': 1.8267371997739081}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 21:21:55,020] Trial 16 finished with value: 0.9467906666666666 and parameters: {'learning_rate': 0.03609619984280296, 'num_leaves': 180, 'max_depth': 12, 'subsample': 0.6430246260649373, 'colsample_bytree': 0.6046362049094831, 'reg_alpha': 1.0378109858704001e-08, 'reg_lambda': 5.072045351269478}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 21:25:41,939] Trial 17 finished with value: 0.9468119999999999 and parameters: {'learning_rate': 0.055138572172675385, 'num_leaves': 195, 'max_depth': 15, 'subsample': 0.6040983523497994, 'colsample_bytree': 0.5812590947309109, 'reg_alpha': 3.439630930511163e-08, 'reg_lambda': 4.9674617726838095}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 21:40:49,018] Trial 18 finished with value: 0.9471066666666668 and parameters: {'learning_rate': 0.013623684725470734, 'num_leaves': 167, 'max_depth': 14, 'subsample': 0.6493336871258287, 'colsample_bytree': 0.5455347348038846, 'reg_alpha': 1.415491936931966e-07, 'reg_lambda': 2.602698184439891}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 21:54:40,256] Trial 19 finished with value: 0.9469453333333334 and parameters: {'learning_rate': 0.0132427679555258, 'num_leaves': 166, 'max_depth': 13, 'subsample': 0.6864050177246761, 'colsample_bytree': 0.5021926400807198, 'reg_alpha': 1.2906456561479036e-06, 'reg_lambda': 2.505971900123211}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 22:05:33,387] Trial 20 finished with value: 0.9470946666666666 and parameters: {'learning_rate': 0.01806021172392633, 'num_leaves': 152, 'max_depth': 14, 'subsample': 0.5849287718788626, 'colsample_bytree': 0.5401865118769928, 'reg_alpha': 4.581063771839155e-06, 'reg_lambda': 2.1886672594176844}. Best is trial 3 with value: 0.9471146666666665.
+[I 2025-08-28 22:17:17,557] Trial 21 finished with value: 0.9471213333333333 and parameters: {'learning_rate': 0.01790404954683705, 'num_leaves': 149, 'max_depth': 14, 'subsample': 0.552888433437157, 'colsample_bytree': 0.5334183378311247, 'reg_alpha': 8.618540775203537e-06, 'reg_lambda': 2.5727325263876564}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-28 22:29:47,597] Trial 22 finished with value: 0.9470026666666665 and parameters: {'learning_rate': 0.014834191953968043, 'num_leaves': 152, 'max_depth': 14, 'subsample': 0.722000898666506, 'colsample_bytree': 0.520172914065047, 'reg_alpha': 3.4467595043261955e-07, 'reg_lambda': 2.824400277196169}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-28 22:46:36,174] Trial 23 finished with value: 0.9469853333333333 and parameters: {'learning_rate': 0.010250508535098252, 'num_leaves': 150, 'max_depth': 14, 'subsample': 0.5553605876522825, 'colsample_bytree': 0.5277263065850542, 'reg_alpha': 2.6463143649162393e-06, 'reg_lambda': 1.0824243764404238}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-28 23:02:48,501] Trial 24 finished with value: 0.947048 and parameters: {'learning_rate': 0.012145082604919429, 'num_leaves': 170, 'max_depth': 13, 'subsample': 0.6616416214399722, 'colsample_bytree': 0.5531599347066565, 'reg_alpha': 1.4695368883560577e-07, 'reg_lambda': 4.502268614630153}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-28 23:13:05,043] Trial 25 finished with value: 0.9469986666666665 and parameters: {'learning_rate': 0.019102458415033607, 'num_leaves': 166, 'max_depth': 14, 'subsample': 0.7303958175704425, 'colsample_bytree': 0.5111896560001767, 'reg_alpha': 1.5244624078045541e-06, 'reg_lambda': 1.8888473586959424}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-28 23:27:45,192] Trial 26 finished with value: 0.9470026666666665 and parameters: {'learning_rate': 0.013913152354033544, 'num_leaves': 156, 'max_depth': 13, 'subsample': 0.6018052561966533, 'colsample_bytree': 0.5318210115605333, 'reg_alpha': 3.2071262303919666e-07, 'reg_lambda': 2.6881461946088}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-28 23:40:14,163] Trial 27 finished with value: 0.9469746666666667 and parameters: {'learning_rate': 0.016236809160630406, 'num_leaves': 145, 'max_depth': 14, 'subsample': 0.6923805089836562, 'colsample_bytree': 0.534311816178405, 'reg_alpha': 9.92648883320996e-06, 'reg_lambda': 4.603065576680934}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-28 23:54:58,196] Trial 28 finished with value: 0.9469626666666666 and parameters: {'learning_rate': 0.013463184879910058, 'num_leaves': 165, 'max_depth': 12, 'subsample': 0.660509010067588, 'colsample_bytree': 0.5615340925455179, 'reg_alpha': 5.672823199292777e-07, 'reg_lambda': 3.1155630689661593}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-29 00:10:18,038] Trial 29 finished with value: 0.9470466666666667 and parameters: {'learning_rate': 0.011757300577332975, 'num_leaves': 174, 'max_depth': 14, 'subsample': 0.6284875515559923, 'colsample_bytree': 0.5716003332341967, 'reg_alpha': 9.071393357220813e-07, 'reg_lambda': 3.259256305176759}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-29 00:17:26,932] Trial 30 finished with value: 0.9468920000000001 and parameters: {'learning_rate': 0.026380599203326024, 'num_leaves': 179, 'max_depth': 14, 'subsample': 0.5901449644504726, 'colsample_bytree': 0.5122665204200965, 'reg_alpha': 2.3105885488894154e-08, 'reg_lambda': 1.5189506449338437}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-29 00:27:41,515] Trial 31 finished with value: 0.9469746666666667 and parameters: {'learning_rate': 0.01890996452169193, 'num_leaves': 150, 'max_depth': 14, 'subsample': 0.551603059542012, 'colsample_bytree': 0.5456653994077789, 'reg_alpha': 4.651796036941749e-06, 'reg_lambda': 2.0663990136909742}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-29 00:38:18,782] Trial 32 finished with value: 0.9471 and parameters: {'learning_rate': 0.016315980830867213, 'num_leaves': 140, 'max_depth': 15, 'subsample': 0.5794616110672322, 'colsample_bytree': 0.5364291236979396, 'reg_alpha': 4.968260934649883e-06, 'reg_lambda': 2.333315389175195}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-29 00:50:33,876] Trial 33 finished with value: 0.9470173333333334 and parameters: {'learning_rate': 0.01590848633834684, 'num_leaves': 141, 'max_depth': 15, 'subsample': 0.5709556419702598, 'colsample_bytree': 0.5501233889147219, 'reg_alpha': 6.151483677563303e-06, 'reg_lambda': 3.506041544332171}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-29 01:05:15,564] Trial 34 finished with value: 0.947076 and parameters: {'learning_rate': 0.012905470221859824, 'num_leaves': 144, 'max_depth': 15, 'subsample': 0.561303628327812, 'colsample_bytree': 0.5384536391917235, 'reg_alpha': 3.336488888205387e-06, 'reg_lambda': 4.2335894654310415}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-29 01:14:34,571] Trial 35 finished with value: 0.9470466666666667 and parameters: {'learning_rate': 0.020433153316187856, 'num_leaves': 140, 'max_depth': 15, 'subsample': 0.6319665357890958, 'colsample_bytree': 0.5257202613704979, 'reg_alpha': 1.7562984615812082e-06, 'reg_lambda': 2.547051559098043}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-29 01:23:50,841] Trial 36 finished with value: 0.9471 and parameters: {'learning_rate': 0.024772877781249623, 'num_leaves': 147, 'max_depth': 15, 'subsample': 0.6732951180900166, 'colsample_bytree': 0.51344407968326, 'reg_alpha': 3.888256970144925e-08, 'reg_lambda': 3.4142516848324354}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-29 01:32:45,982] Trial 37 finished with value: 0.9469879999999999 and parameters: {'learning_rate': 0.022821480918069292, 'num_leaves': 156, 'max_depth': 13, 'subsample': 0.5920785442573647, 'colsample_bytree': 0.5546802628128553, 'reg_alpha': 3.2507206094696567e-06, 'reg_lambda': 2.9797875973935772}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-29 01:49:41,573] Trial 38 finished with value: 0.9469933333333334 and parameters: {'learning_rate': 0.011212223123728871, 'num_leaves': 171, 'max_depth': 12, 'subsample': 0.5773490892869417, 'colsample_bytree': 0.5720037267921528, 'reg_alpha': 6.429879308893868e-06, 'reg_lambda': 6.43844315610392}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-29 01:57:18,717] Trial 39 finished with value: 0.9470786666666665 and parameters: {'learning_rate': 0.030600333084954048, 'num_leaves': 143, 'max_depth': 13, 'subsample': 0.6000125544218369, 'colsample_bytree': 0.5090600889900257, 'reg_alpha': 2.2768625103439256e-07, 'reg_lambda': 3.7666752079262045}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-29 02:09:59,444] Trial 40 finished with value: 0.9471079999999998 and parameters: {'learning_rate': 0.015436505939812243, 'num_leaves': 147, 'max_depth': 15, 'subsample': 0.6107319969850219, 'colsample_bytree': 0.5319709292505131, 'reg_alpha': 9.291862140880024e-08, 'reg_lambda': 1.5682388820101214}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-29 02:22:48,398] Trial 41 finished with value: 0.9471013333333334 and parameters: {'learning_rate': 0.015642181782153847, 'num_leaves': 148, 'max_depth': 15, 'subsample': 0.6515031385094939, 'colsample_bytree': 0.5336519220715671, 'reg_alpha': 9.954347554031263e-08, 'reg_lambda': 1.5946259372852083}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-29 02:36:06,024] Trial 42 finished with value: 0.947084 and parameters: {'learning_rate': 0.014786198450545178, 'num_leaves': 160, 'max_depth': 15, 'subsample': 0.65164557646134, 'colsample_bytree': 0.5261376578049932, 'reg_alpha': 1.167487317215809e-07, 'reg_lambda': 1.5041953902532763}. Best is trial 21 with value: 0.9471213333333333.
+[I 2025-08-29 02:51:18,878] Trial 43 finished with value: 0.9471386666666668 and parameters: {'learning_rate': 0.012595564402104251, 'num_leaves': 148, 'max_depth': 15, 'subsample': 0.65182615325642, 'colsample_bytree': 0.5191337540182727, 'reg_alpha': 9.683407089906042e-08, 'reg_lambda': 1.613251587499679}. Best is trial 43 with value: 0.9471386666666668.
+[I 2025-08-29 03:06:19,638] Trial 44 finished with value: 0.9470133333333333 and parameters: {'learning_rate': 0.012614222863423043, 'num_leaves': 153, 'max_depth': 15, 'subsample': 0.6705941561183404, 'colsample_bytree': 0.5185162120827308, 'reg_alpha': 5.3286145262440924e-08, 'reg_lambda': 2.13856895318561}. Best is trial 43 with value: 0.9471386666666668.
+[I 2025-08-29 03:19:53,168] Trial 45 finished with value: 0.9471293333333334 and parameters: {'learning_rate': 0.013910160381575094, 'num_leaves': 184, 'max_depth': 14, 'subsample': 0.6207251361094911, 'colsample_bytree': 0.5002174875480647, 'reg_alpha': 2.245936585818251e-07, 'reg_lambda': 1.5527604227726832}. Best is trial 43 with value: 0.9471386666666668.
+[I 2025-08-29 03:37:18,526] Trial 46 finished with value: 0.9471266666666667 and parameters: {'learning_rate': 0.010954938638720968, 'num_leaves': 177, 'max_depth': 15, 'subsample': 0.6159169492625676, 'colsample_bytree': 0.5031631761718759, 'reg_alpha': 4.313535067868076e-07, 'reg_lambda': 1.4525985439612223}. Best is trial 43 with value: 0.9471386666666668.
+[I 2025-08-29 03:54:43,464] Trial 47 finished with value: 0.9471453333333333 and parameters: {'learning_rate': 0.010993029261461581, 'num_leaves': 184, 'max_depth': 14, 'subsample': 0.6279321105503699, 'colsample_bytree': 0.5034702091158328, 'reg_alpha': 4.769004163898552e-07, 'reg_lambda': 1.1705377538088118}. Best is trial 47 with value: 0.9471453333333333.
+[I 2025-08-29 04:11:50,300] Trial 48 finished with value: 0.9469239999999999 and parameters: {'learning_rate': 0.010809564571977508, 'num_leaves': 183, 'max_depth': 14, 'subsample': 0.6252660376396126, 'colsample_bytree': 0.5015970118669739, 'reg_alpha': 4.781864079754895e-07, 'reg_lambda': 1.0696514859877442}. Best is trial 47 with value: 0.9471453333333333.
+[I 2025-08-29 04:31:48,563] Trial 49 finished with value: 0.9469799999999999 and parameters: {'learning_rate': 0.010112714686392769, 'num_leaves': 186, 'max_depth': 14, 'subsample': 0.6357500885043301, 'colsample_bytree': 0.5077109149575695, 'reg_alpha': 2.3002024318041442e-07, 'reg_lambda': 1.0458213959899718}. Best is trial 47 with value: 0.9471453333333333.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3583]  valid_0's auc: 0.977738
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2675]  valid_0's auc: 0.976806
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2592]  valid_0's auc: 0.976224
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2726]  valid_0's auc: 0.977268
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3666]  valid_0's auc: 0.976894
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[990]   valid_0's auc: 0.977683
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1121]  valid_0's auc: 0.976764
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1017]  valid_0's auc: 0.976183
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[960]   valid_0's auc: 0.977291
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1151]  valid_0's auc: 0.976781
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2065]  valid_0's auc: 0.977736
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1707]  valid_0's auc: 0.976798
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1752]  valid_0's auc: 0.976243
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2169]  valid_0's auc: 0.977331
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1961]  valid_0's auc: 0.976742
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2652]  valid_0's auc: 0.977753
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2702]  valid_0's auc: 0.976938
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2227]  valid_0's auc: 0.976291
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3169]  valid_0's auc: 0.977416
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2880]  valid_0's auc: 0.976834
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2374]  valid_0's auc: 0.977731
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2403]  valid_0's auc: 0.976789
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2467]  valid_0's auc: 0.976225
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2259]  valid_0's auc: 0.977246
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2992]  valid_0's auc: 0.976858
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1371]  valid_0's auc: 0.977695
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1526]  valid_0's auc: 0.976851
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1504]  valid_0's auc: 0.976297
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1602]  valid_0's auc: 0.977282
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1963]  valid_0's auc: 0.976909
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[932]   valid_0's auc: 0.977652
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1147]  valid_0's auc: 0.976796
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[778]   valid_0's auc: 0.976162
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1191]  valid_0's auc: 0.977274
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1426]  valid_0's auc: 0.976779
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[895]   valid_0's auc: 0.977667
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[930]   valid_0's auc: 0.97673
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[767]   valid_0's auc: 0.976119
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[981]   valid_0's auc: 0.977149
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1118]  valid_0's auc: 0.97669
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1271]  valid_0's auc: 0.977688
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1627]  valid_0's auc: 0.976887
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1511]  valid_0's auc: 0.976305
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2198]  valid_0's auc: 0.977378
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2268]  valid_0's auc: 0.976821
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1723]  valid_0's auc: 0.97764
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1309]  valid_0's auc: 0.976687
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1709]  valid_0's auc: 0.976131
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2227]  valid_0's auc: 0.977275
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2397]  valid_0's auc: 0.97677
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2816]  valid_0's auc: 0.977772
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2835]  valid_0's auc: 0.976919
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3047]  valid_0's auc: 0.976334
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3389]  valid_0's auc: 0.977425
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2681]  valid_0's auc: 0.976877
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1453]  valid_0's auc: 0.977829
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1213]  valid_0's auc: 0.976815
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1163]  valid_0's auc: 0.976268
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[855]   valid_0's auc: 0.977273
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1347]  valid_0's auc: 0.976832
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2251]  valid_0's auc: 0.977741
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2075]  valid_0's auc: 0.976841
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2543]  valid_0's auc: 0.97618
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2361]  valid_0's auc: 0.97732
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2934]  valid_0's auc: 0.976818
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1217]  valid_0's auc: 0.977739
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[918]   valid_0's auc: 0.976826
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1324]  valid_0's auc: 0.97624
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1258]  valid_0's auc: 0.977395
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1629]  valid_0's auc: 0.97685
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2049]  valid_0's auc: 0.977757
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1266]  valid_0's auc: 0.976751
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2045]  valid_0's auc: 0.976259
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2306]  valid_0's auc: 0.977371
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2031]  valid_0's auc: 0.976809
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2839]  valid_0's auc: 0.977747
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3296]  valid_0's auc: 0.976879
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2951]  valid_0's auc: 0.976282
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3861]  valid_0's auc: 0.977462
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3166]  valid_0's auc: 0.976841
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1073]  valid_0's auc: 0.977619
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1173]  valid_0's auc: 0.976717
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1205]  valid_0's auc: 0.976107
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1337]  valid_0's auc: 0.977225
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1271]  valid_0's auc: 0.976682
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[553]   valid_0's auc: 0.977679
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[519]   valid_0's auc: 0.97666
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[631]   valid_0's auc: 0.976139
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[607]   valid_0's auc: 0.977215
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[574]   valid_0's auc: 0.976623
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2803]  valid_0's auc: 0.977802
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2519]  valid_0's auc: 0.976924
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2816]  valid_0's auc: 0.976335
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2940]  valid_0's auc: 0.977423
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3060]  valid_0's auc: 0.976841
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2652]  valid_0's auc: 0.977717
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2149]  valid_0's auc: 0.97682
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2600]  valid_0's auc: 0.976279
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2639]  valid_0's auc: 0.977391
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3120]  valid_0's auc: 0.976809
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2254]  valid_0's auc: 0.977773
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1932]  valid_0's auc: 0.976892
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2223]  valid_0's auc: 0.976305
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2190]  valid_0's auc: 0.977363
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2034]  valid_0's auc: 0.976857
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2289]  valid_0's auc: 0.977854
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2107]  valid_0's auc: 0.976941
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2240]  valid_0's auc: 0.976318
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2275]  valid_0's auc: 0.977434
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2698]  valid_0's auc: 0.97685
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2488]  valid_0's auc: 0.977768
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2300]  valid_0's auc: 0.976912
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1697]  valid_0's auc: 0.97621
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2784]  valid_0's auc: 0.977443
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2835]  valid_0's auc: 0.976911
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[4151]  valid_0's auc: 0.977839
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3217]  valid_0's auc: 0.976863
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2798]  valid_0's auc: 0.976267
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3538]  valid_0's auc: 0.977404
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3077]  valid_0's auc: 0.976781
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2692]  valid_0's auc: 0.977766
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2668]  valid_0's auc: 0.976885
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3454]  valid_0's auc: 0.976321
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3418]  valid_0's auc: 0.977423
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2918]  valid_0's auc: 0.976797
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1962]  valid_0's auc: 0.977772
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1720]  valid_0's auc: 0.976852
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2001]  valid_0's auc: 0.976327
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2132]  valid_0's auc: 0.977424
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1608]  valid_0's auc: 0.976801
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3249]  valid_0's auc: 0.97781
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3311]  valid_0's auc: 0.976938
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2756]  valid_0's auc: 0.97629
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2216]  valid_0's auc: 0.97729
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2717]  valid_0's auc: 0.9768
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2537]  valid_0's auc: 0.977824
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1970]  valid_0's auc: 0.976912
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2457]  valid_0's auc: 0.976326
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3341]  valid_0's auc: 0.977473
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2173]  valid_0's auc: 0.976814
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2764]  valid_0's auc: 0.977702
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2413]  valid_0's auc: 0.976804
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2905]  valid_0's auc: 0.976259
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3114]  valid_0's auc: 0.977346
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3096]  valid_0's auc: 0.976792
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2741]  valid_0's auc: 0.977771
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2038]  valid_0's auc: 0.976816
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2602]  valid_0's auc: 0.976303
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3204]  valid_0's auc: 0.977419
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3400]  valid_0's auc: 0.976929
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1392]  valid_0's auc: 0.977751
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1272]  valid_0's auc: 0.97683
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1355]  valid_0's auc: 0.976239
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1205]  valid_0's auc: 0.977265
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[937]   valid_0's auc: 0.976817
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2383]  valid_0's auc: 0.977803
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1925]  valid_0's auc: 0.976943
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1709]  valid_0's auc: 0.976265
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2441]  valid_0's auc: 0.977423
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1648]  valid_0's auc: 0.976822
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2051]  valid_0's auc: 0.977712
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1760]  valid_0's auc: 0.976889
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2632]  valid_0's auc: 0.976321
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2810]  valid_0's auc: 0.977429
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1320]  valid_0's auc: 0.97672
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2851]  valid_0's auc: 0.977859
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2385]  valid_0's auc: 0.976954
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2238]  valid_0's auc: 0.976338
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2600]  valid_0's auc: 0.977427
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2319]  valid_0's auc: 0.97683
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2325]  valid_0's auc: 0.977812
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2631]  valid_0's auc: 0.976938
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3096]  valid_0's auc: 0.976368
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3181]  valid_0's auc: 0.977447
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3255]  valid_0's auc: 0.976889
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1730]  valid_0's auc: 0.977749
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1930]  valid_0's auc: 0.976899
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1965]  valid_0's auc: 0.976322
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1963]  valid_0's auc: 0.977387
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1681]  valid_0's auc: 0.976806
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1886]  valid_0's auc: 0.977809
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1973]  valid_0's auc: 0.976963
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1678]  valid_0's auc: 0.976375
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1474]  valid_0's auc: 0.977409
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2044]  valid_0's auc: 0.976939
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1687]  valid_0's auc: 0.977714
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1765]  valid_0's auc: 0.976829
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1628]  valid_0's auc: 0.976242
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1655]  valid_0's auc: 0.977371
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1836]  valid_0's auc: 0.976865
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3386]  valid_0's auc: 0.977755
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2033]  valid_0's auc: 0.976764
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2816]  valid_0's auc: 0.976205
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3657]  valid_0's auc: 0.977365
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[4073]  valid_0's auc: 0.976801
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1333]  valid_0's auc: 0.977711
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1209]  valid_0's auc: 0.976798
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1717]  valid_0's auc: 0.976292
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1512]  valid_0's auc: 0.977376
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1805]  valid_0's auc: 0.976769
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2748]  valid_0's auc: 0.977872
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2085]  valid_0's auc: 0.976833
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2608]  valid_0's auc: 0.976344
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2907]  valid_0's auc: 0.977393
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2233]  valid_0's auc: 0.976817
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2686]  valid_0's auc: 0.97784
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2194]  valid_0's auc: 0.976922
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2729]  valid_0's auc: 0.976342
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2256]  valid_0's auc: 0.977423
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2815]  valid_0's auc: 0.976908
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2889]  valid_0's auc: 0.977845
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2320]  valid_0's auc: 0.976928
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2477]  valid_0's auc: 0.976336
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2355]  valid_0's auc: 0.977381
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2598]  valid_0's auc: 0.97688
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3583]  valid_0's auc: 0.977913
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2588]  valid_0's auc: 0.976946
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3504]  valid_0's auc: 0.976405
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2647]  valid_0's auc: 0.977397
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2734]  valid_0's auc: 0.976854
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3116]  valid_0's auc: 0.977881
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2440]  valid_0's auc: 0.97691
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3437]  valid_0's auc: 0.976408
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3479]  valid_0's auc: 0.977486
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[1958]  valid_0's auc: 0.97671
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2409]  valid_0's auc: 0.977824
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2113]  valid_0's auc: 0.976907
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2330]  valid_0's auc: 0.976338
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2408]  valid_0's auc: 0.977391
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2603]  valid_0's auc: 0.97685
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2684]  valid_0's auc: 0.977839
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2910]  valid_0's auc: 0.976933
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2846]  valid_0's auc: 0.976303
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3438]  valid_0's auc: 0.977434
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3796]  valid_0's auc: 0.976939
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2708]  valid_0's auc: 0.977794
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2703]  valid_0's auc: 0.976894
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3276]  valid_0's auc: 0.976325
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3742]  valid_0's auc: 0.977467
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2966]  valid_0's auc: 0.976887
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2878]  valid_0's auc: 0.977745
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2954]  valid_0's auc: 0.976869
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[2961]  valid_0's auc: 0.9763
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3381]  valid_0's auc: 0.977372
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3177]  valid_0's auc: 0.976865
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3112]  valid_0's auc: 0.97781
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3591]  valid_0's auc: 0.97692
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3520]  valid_0's auc: 0.976339
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3779]  valid_0's auc: 0.977382
+Training until validation scores don't improve for 100 rounds
+Early stopping, best iteration is:
+[3850]  valid_0's auc: 0.976874
+Best parameters: {'learning_rate': 0.010993029261461581, 'num_leaves': 184, 'max_depth': 14, 'subsample': 0.6279321105503699, 'colsample_bytree': 0.5034702091158328, 'reg_alpha': 4.769004163898552e-07, 'reg_lambda': 1.1705377538088118}
+Best validation accuracy: 0.9471453333333333
+Best validation AUC: 0.9770733567038846</code></pre>
+</div>
+</div>
+<div id="00e3146b-4de2-4007-ae3f-f89bf6c7d64b" class="cell" data-execution_count="69">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>LGBM_PARAMS <span class="op">=</span> {<span class="st">'learning_rate'</span>: <span class="fl">0.010993029261461581</span>, <span class="st">'num_leaves'</span>: <span class="dv">184</span>, <span class="st">'max_depth'</span>: <span class="dv">14</span>, <span class="st">'subsample'</span>: <span class="fl">0.6279321105503699</span>, <span class="st">'colsample_bytree'</span>: <span class="fl">0.5034702091158328</span>, <span class="st">'reg_alpha'</span>: <span class="fl">4.769004163898552e-07</span>, <span class="st">'reg_lambda'</span>: <span class="fl">1.1705377538088118</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="tuning-xgboost" class="level1">
+<h1>Tuning XGBoost</h1>
+<div id="ecd5aafb-0ab6-4b9a-9314-087609289866" class="cell" data-execution_count="49">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> objective_xgb(trial):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    param <span class="op">=</span> {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"objective"</span>: <span class="st">"binary:logistic"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"eval_metric"</span>: <span class="st">"auc"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"tree_method"</span>: <span class="st">"hist"</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"learning_rate"</span>: trial.suggest_float(<span class="st">"learning_rate"</span>, <span class="fl">0.01</span>, <span class="fl">0.3</span>, log<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"max_depth"</span>: trial.suggest_int(<span class="st">"max_depth"</span>, <span class="dv">3</span>, <span class="dv">12</span>),</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"min_child_weight"</span>: trial.suggest_int(<span class="st">"min_child_weight"</span>, <span class="dv">1</span>, <span class="dv">10</span>),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"subsample"</span>: trial.suggest_float(<span class="st">"subsample"</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>),</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"colsample_bytree"</span>: trial.suggest_float(<span class="st">"colsample_bytree"</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>),</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"lambda"</span>: trial.suggest_float(<span class="st">"lambda"</span>, <span class="fl">1e-3</span>, <span class="fl">10.0</span>, log<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"alpha"</span>: trial.suggest_float(<span class="st">"alpha"</span>, <span class="fl">1e-3</span>, <span class="fl">10.0</span>, log<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    kf <span class="op">=</span> StratifiedKFold(n_splits<span class="op">=</span><span class="dv">5</span>, shuffle<span class="op">=</span><span class="va">True</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    acc_scores, auc_scores <span class="op">=</span> [], []</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> train_idx, valid_idx <span class="kw">in</span> kf.split(X, y):</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        X_train, X_valid <span class="op">=</span> X.iloc[train_idx], X.iloc[valid_idx]</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        y_train, y_valid <span class="op">=</span> y.iloc[train_idx], y.iloc[valid_idx]</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        dtrain <span class="op">=</span> xgb.DMatrix(X_train, label<span class="op">=</span>y_train)</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>        dvalid <span class="op">=</span> xgb.DMatrix(X_valid, label<span class="op">=</span>y_valid)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>        evals <span class="op">=</span> [(dtrain, <span class="st">"train"</span>), (dvalid, <span class="st">"valid"</span>)]</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>        booster <span class="op">=</span> xgb.train(</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>            param,</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>            dtrain,</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>            num_boost_round<span class="op">=</span><span class="dv">10000</span>,   <span class="co"># &lt;-- controls boosting rounds</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>            evals<span class="op">=</span>evals,</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>            early_stopping_rounds<span class="op">=</span><span class="dv">100</span>,</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>            verbose_eval<span class="op">=</span><span class="va">False</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>        y_pred_proba <span class="op">=</span> booster.predict(dvalid, iteration_range<span class="op">=</span>(<span class="dv">0</span>, booster.best_iteration<span class="op">+</span><span class="dv">1</span>))</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>        y_pred <span class="op">=</span> (y_pred_proba <span class="op">&gt;</span> <span class="fl">0.5</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>        acc_scores.append(accuracy_score(y_valid, y_pred))</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>        auc_scores.append(roc_auc_score(y_valid, y_pred_proba))</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>    mean_auc <span class="op">=</span> np.mean(auc_scores)</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>    trial.set_user_attr(<span class="st">"mean_auc"</span>, mean_auc)</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.mean(acc_scores)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="0d63cb0f-9dca-4ad4-ac17-0c5fdef0510f" class="cell" data-scrolled="true" data-execution_count="51">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For XGBoost</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>study <span class="op">=</span> optuna.create_study(direction<span class="op">=</span><span class="st">"maximize"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>study.optimize(objective_xgb, n_trials<span class="op">=</span><span class="dv">50</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>XGB_PARAMS <span class="op">=</span> study.best_params</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[I 2025-08-29 10:00:25,253] A new study created in memory with name: no-name-7284ab1b-6d0e-453f-af4b-ec170e6797bf
+[I 2025-08-29 10:04:15,571] Trial 0 finished with value: 0.9463533333333334 and parameters: {'learning_rate': 0.06397910180755237, 'max_depth': 10, 'min_child_weight': 2, 'subsample': 0.7448017498217351, 'colsample_bytree': 0.536590372391071, 'lambda': 0.002409348615632408, 'alpha': 0.007003285712113528}. Best is trial 0 with value: 0.9463533333333334.
+[I 2025-08-29 10:20:14,760] Trial 1 finished with value: 0.946012 and parameters: {'learning_rate': 0.054376591816573096, 'max_depth': 5, 'min_child_weight': 7, 'subsample': 0.5743349259648203, 'colsample_bytree': 0.6317384297132943, 'lambda': 1.0600507330839255, 'alpha': 0.07503842934835327}. Best is trial 0 with value: 0.9463533333333334.
+[I 2025-08-29 10:41:59,054] Trial 2 finished with value: 0.9467040000000001 and parameters: {'learning_rate': 0.01756269410208437, 'max_depth': 8, 'min_child_weight': 5, 'subsample': 0.8687456840893735, 'colsample_bytree': 0.674353204826178, 'lambda': 0.35960103230553236, 'alpha': 0.004418402435263143}. Best is trial 2 with value: 0.9467040000000001.
+[I 2025-08-29 10:43:46,342] Trial 3 finished with value: 0.9443986666666667 and parameters: {'learning_rate': 0.22712912960149248, 'max_depth': 8, 'min_child_weight': 7, 'subsample': 0.5630579755067613, 'colsample_bytree': 0.982132330035836, 'lambda': 0.0016727576118352847, 'alpha': 0.11438827552646258}. Best is trial 2 with value: 0.9467040000000001.
+[I 2025-08-29 11:01:34,657] Trial 4 finished with value: 0.9463199999999998 and parameters: {'learning_rate': 0.04909268306281862, 'max_depth': 5, 'min_child_weight': 3, 'subsample': 0.7681525111453608, 'colsample_bytree': 0.9755379030919182, 'lambda': 4.471505936054782, 'alpha': 0.27488250170370443}. Best is trial 2 with value: 0.9467040000000001.
+[I 2025-08-29 11:03:21,341] Trial 5 finished with value: 0.945108 and parameters: {'learning_rate': 0.20119702024796496, 'max_depth': 9, 'min_child_weight': 2, 'subsample': 0.8565621237422115, 'colsample_bytree': 0.7445134891458584, 'lambda': 0.0047895936484365804, 'alpha': 0.2403133033178513}. Best is trial 2 with value: 0.9467040000000001.
+[I 2025-08-29 11:09:44,514] Trial 6 finished with value: 0.9456640000000001 and parameters: {'learning_rate': 0.17157213104145666, 'max_depth': 5, 'min_child_weight': 2, 'subsample': 0.6855825123860512, 'colsample_bytree': 0.7275815038867597, 'lambda': 9.525770984116653, 'alpha': 3.2912627370844914}. Best is trial 2 with value: 0.9467040000000001.
+[I 2025-08-29 11:18:33,679] Trial 7 finished with value: 0.9463013333333332 and parameters: {'learning_rate': 0.035029002592859015, 'max_depth': 8, 'min_child_weight': 6, 'subsample': 0.5740425418481268, 'colsample_bytree': 0.7275185965605825, 'lambda': 0.006346224036517816, 'alpha': 0.008966800310644146}. Best is trial 2 with value: 0.9467040000000001.
+[I 2025-08-29 11:24:58,119] Trial 8 finished with value: 0.9456026666666666 and parameters: {'learning_rate': 0.1268089042864832, 'max_depth': 5, 'min_child_weight': 6, 'subsample': 0.5540491297587855, 'colsample_bytree': 0.8058191340808181, 'lambda': 0.002375999189539216, 'alpha': 1.0674225512969806}. Best is trial 2 with value: 0.9467040000000001.
+[I 2025-08-29 11:42:02,964] Trial 9 finished with value: 0.9465119999999999 and parameters: {'learning_rate': 0.025842921391697672, 'max_depth': 7, 'min_child_weight': 6, 'subsample': 0.6847699833066359, 'colsample_bytree': 0.5492555548140662, 'lambda': 0.17239869825215134, 'alpha': 0.014377899189249716}. Best is trial 2 with value: 0.9467040000000001.
+[I 2025-08-29 12:02:09,843] Trial 10 finished with value: 0.9466360000000001 and parameters: {'learning_rate': 0.011212438352539489, 'max_depth': 12, 'min_child_weight': 10, 'subsample': 0.997432109130707, 'colsample_bytree': 0.8495849501568995, 'lambda': 0.06227538357009994, 'alpha': 0.0013426169096169708}. Best is trial 2 with value: 0.9467040000000001.
+[I 2025-08-29 12:23:33,442] Trial 11 finished with value: 0.9467986666666667 and parameters: {'learning_rate': 0.010714590404221007, 'max_depth': 12, 'min_child_weight': 10, 'subsample': 0.9817294171450357, 'colsample_bytree': 0.8423077284894834, 'lambda': 0.05980977132060466, 'alpha': 0.001035811767941075}. Best is trial 11 with value: 0.9467986666666667.
+[I 2025-08-29 12:46:22,367] Trial 12 finished with value: 0.9466933333333334 and parameters: {'learning_rate': 0.010121688727710824, 'max_depth': 12, 'min_child_weight': 10, 'subsample': 0.984516238619515, 'colsample_bytree': 0.884116527988682, 'lambda': 0.07996470868797388, 'alpha': 0.001118461638482389}. Best is trial 11 with value: 0.9467986666666667.
+[I 2025-08-29 13:01:45,065] Trial 13 finished with value: 0.9467813333333334 and parameters: {'learning_rate': 0.018185170903253774, 'max_depth': 10, 'min_child_weight': 8, 'subsample': 0.9244831727180319, 'colsample_bytree': 0.6353701525731309, 'lambda': 0.5633423436047672, 'alpha': 0.003216859199542575}. Best is trial 11 with value: 0.9467986666666667.
+[I 2025-08-29 13:15:52,275] Trial 14 finished with value: 0.9467746666666667 and parameters: {'learning_rate': 0.0186764456810132, 'max_depth': 11, 'min_child_weight': 9, 'subsample': 0.9205172986160844, 'colsample_bytree': 0.6150175301357245, 'lambda': 0.018102183331139842, 'alpha': 0.0237594936468839}. Best is trial 11 with value: 0.9467986666666667.
+[I 2025-08-29 13:32:43,784] Trial 15 finished with value: 0.9467640000000002 and parameters: {'learning_rate': 0.01624451883784382, 'max_depth': 10, 'min_child_weight': 8, 'subsample': 0.9276890886983833, 'colsample_bytree': 0.908955270980286, 'lambda': 0.9276888556616971, 'alpha': 0.002504007866680383}. Best is trial 11 with value: 0.9467986666666667.
+[I 2025-08-29 13:41:10,151] Trial 16 finished with value: 0.9466906666666667 and parameters: {'learning_rate': 0.028125323443279865, 'max_depth': 11, 'min_child_weight': 9, 'subsample': 0.8271970902637922, 'colsample_bytree': 0.8119572762705516, 'lambda': 0.027028203453887095, 'alpha': 0.03179180713097023}. Best is trial 11 with value: 0.9467986666666667.
+[I 2025-08-29 14:01:50,952] Trial 17 finished with value: 0.9469280000000001 and parameters: {'learning_rate': 0.013943125294959833, 'max_depth': 10, 'min_child_weight': 8, 'subsample': 0.928872408885073, 'colsample_bytree': 0.6645699712831215, 'lambda': 0.6338641727511285, 'alpha': 0.0029378573797007377}. Best is trial 17 with value: 0.9469280000000001.
+[I 2025-08-29 14:29:36,600] Trial 18 finished with value: 0.9456773333333333 and parameters: {'learning_rate': 0.10203055722445419, 'max_depth': 3, 'min_child_weight': 9, 'subsample': 0.9521277251303754, 'colsample_bytree': 0.7906837214694281, 'lambda': 2.133838274374926, 'alpha': 0.0014630734777107083}. Best is trial 17 with value: 0.9469280000000001.
+[I 2025-08-29 14:47:24,491] Trial 19 finished with value: 0.9468573333333333 and parameters: {'learning_rate': 0.012967106179781298, 'max_depth': 12, 'min_child_weight': 4, 'subsample': 0.8714361656127929, 'colsample_bytree': 0.6948974225124015, 'lambda': 0.20441756353657484, 'alpha': 6.484956662266637}. Best is trial 17 with value: 0.9469280000000001.
+[I 2025-08-29 14:54:35,075] Trial 20 finished with value: 0.9467266666666667 and parameters: {'learning_rate': 0.03474123483508187, 'max_depth': 11, 'min_child_weight': 4, 'subsample': 0.7963651741470913, 'colsample_bytree': 0.6758924270143679, 'lambda': 0.21997080793061805, 'alpha': 4.156638295481347}. Best is trial 17 with value: 0.9469280000000001.
+[I 2025-08-29 15:16:08,108] Trial 21 finished with value: 0.9470533333333334 and parameters: {'learning_rate': 0.012412801450917393, 'max_depth': 12, 'min_child_weight': 4, 'subsample': 0.8887202512970873, 'colsample_bytree': 0.5808830651466986, 'lambda': 0.033435244058099445, 'alpha': 8.908677237427318}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 15:31:03,857] Trial 22 finished with value: 0.9469573333333333 and parameters: {'learning_rate': 0.013907819667105815, 'max_depth': 12, 'min_child_weight': 4, 'subsample': 0.8797143425487695, 'colsample_bytree': 0.5791698978572213, 'lambda': 0.019343051013296194, 'alpha': 1.2216157754005563}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 15:41:48,022] Trial 23 finished with value: 0.9468973333333335 and parameters: {'learning_rate': 0.023485691739278485, 'max_depth': 11, 'min_child_weight': 4, 'subsample': 0.9082465927708994, 'colsample_bytree': 0.5037117571679212, 'lambda': 0.022933027562801453, 'alpha': 1.3809535219263362}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 16:01:34,653] Trial 24 finished with value: 0.9468653333333332 and parameters: {'learning_rate': 0.014914083709848336, 'max_depth': 9, 'min_child_weight': 1, 'subsample': 0.8171533424092142, 'colsample_bytree': 0.5790510213865078, 'lambda': 0.010512053689320136, 'alpha': 1.3593118461626423}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 16:22:28,799] Trial 25 finished with value: 0.9468786666666666 and parameters: {'learning_rate': 0.013070226690246729, 'max_depth': 10, 'min_child_weight': 5, 'subsample': 0.8834384258122839, 'colsample_bytree': 0.5922100065087338, 'lambda': 0.03133619948891633, 'alpha': 0.4432687589210529}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 16:33:45,443] Trial 26 finished with value: 0.9467866666666666 and parameters: {'learning_rate': 0.021369997305860387, 'max_depth': 12, 'min_child_weight': 3, 'subsample': 0.7506380082248817, 'colsample_bytree': 0.5683078880193013, 'lambda': 0.008861851906686488, 'alpha': 7.433448987309704}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 16:42:59,222] Trial 27 finished with value: 0.946908 and parameters: {'learning_rate': 0.040887146764161934, 'max_depth': 9, 'min_child_weight': 5, 'subsample': 0.9508309241766639, 'colsample_bytree': 0.5240414062146463, 'lambda': 0.11787460488877984, 'alpha': 2.545980403856639}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 16:46:51,456] Trial 28 finished with value: 0.9464253333333333 and parameters: {'learning_rate': 0.08085110083169111, 'max_depth': 11, 'min_child_weight': 3, 'subsample': 0.8262409138142971, 'colsample_bytree': 0.650846258287397, 'lambda': 0.03484442586790247, 'alpha': 9.867762642382953}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 17:04:28,569] Trial 29 finished with value: 0.9468266666666667 and parameters: {'learning_rate': 0.012907033755819326, 'max_depth': 10, 'min_child_weight': 1, 'subsample': 0.6956166367355541, 'colsample_bytree': 0.5959079701289344, 'lambda': 0.0038783102457417354, 'alpha': 0.690509388681336}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 17:12:46,222] Trial 30 finished with value: 0.946832 and parameters: {'learning_rate': 0.03052489501232459, 'max_depth': 11, 'min_child_weight': 7, 'subsample': 0.8939137655563842, 'colsample_bytree': 0.5576869266776857, 'lambda': 0.001102874435952831, 'alpha': 0.0841969864656747}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 17:22:15,672] Trial 31 finished with value: 0.9467679999999999 and parameters: {'learning_rate': 0.03960188200764446, 'max_depth': 9, 'min_child_weight': 5, 'subsample': 0.9506352950859173, 'colsample_bytree': 0.5057687677487611, 'lambda': 0.1446219044398966, 'alpha': 2.6434932605699326}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 17:34:16,378] Trial 32 finished with value: 0.9467546666666667 and parameters: {'learning_rate': 0.046414210918623196, 'max_depth': 7, 'min_child_weight': 4, 'subsample': 0.9570789942815366, 'colsample_bytree': 0.5333732031785056, 'lambda': 0.3428505309861617, 'alpha': 1.965978242278654}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 17:39:22,646] Trial 33 finished with value: 0.9463573333333333 and parameters: {'learning_rate': 0.07524097524213814, 'max_depth': 9, 'min_child_weight': 5, 'subsample': 0.8420681486128354, 'colsample_bytree': 0.6169989877210487, 'lambda': 0.015096954744850885, 'alpha': 4.532017228136932}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 17:43:30,733] Trial 34 finished with value: 0.946148 and parameters: {'learning_rate': 0.06211018532432833, 'max_depth': 10, 'min_child_weight': 3, 'subsample': 0.6270669921478296, 'colsample_bytree': 0.5280972205918641, 'lambda': 0.045418773536408406, 'alpha': 0.6951322019081653}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 18:04:53,506] Trial 35 finished with value: 0.9465106666666667 and parameters: {'learning_rate': 0.019332113024107957, 'max_depth': 7, 'min_child_weight': 4, 'subsample': 0.5175592473460184, 'colsample_bytree': 0.6601505001868195, 'lambda': 0.09844752749875343, 'alpha': 0.15907703851639357}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 18:29:28,976] Trial 36 finished with value: 0.9466759999999999 and parameters: {'learning_rate': 0.014893246828383729, 'max_depth': 8, 'min_child_weight': 7, 'subsample': 0.782075302134637, 'colsample_bytree': 0.7023210096258182, 'lambda': 1.6304121861198875, 'alpha': 0.03602032692287237}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 18:31:14,388] Trial 37 finished with value: 0.9448133333333335 and parameters: {'learning_rate': 0.2656479426704139, 'max_depth': 9, 'min_child_weight': 5, 'subsample': 0.8570225124980216, 'colsample_bytree': 0.6113943244007658, 'lambda': 0.8146106995587804, 'alpha': 2.65818615262174}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 19:00:35,088] Trial 38 finished with value: 0.9465893333333332 and parameters: {'learning_rate': 0.021947850767722647, 'max_depth': 6, 'min_child_weight': 6, 'subsample': 0.8925106207415011, 'colsample_bytree': 0.5324864833494535, 'lambda': 0.44189328709793846, 'alpha': 0.3445087511014849}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 19:27:07,042] Trial 39 finished with value: 0.9459880000000002 and parameters: {'learning_rate': 0.14224505031783607, 'max_depth': 3, 'min_child_weight': 3, 'subsample': 0.9641089150210195, 'colsample_bytree': 0.5677787814705816, 'lambda': 0.13214915629068863, 'alpha': 5.56702977180431}. Best is trial 21 with value: 0.9470533333333334.
+[I 2025-08-29 19:48:50,739] Trial 40 finished with value: 0.9470599999999999 and parameters: {'learning_rate': 0.012617622233602157, 'max_depth': 12, 'min_child_weight': 2, 'subsample': 0.9322099102829974, 'colsample_bytree': 0.5923810290583817, 'lambda': 3.53548926977333, 'alpha': 9.887504768278703}. Best is trial 40 with value: 0.9470599999999999.
+[I 2025-08-29 20:10:04,312] Trial 41 finished with value: 0.9469533333333333 and parameters: {'learning_rate': 0.012909338705659865, 'max_depth': 12, 'min_child_weight': 2, 'subsample': 0.9232908569984508, 'colsample_bytree': 0.6379695177912221, 'lambda': 5.244879037327169, 'alpha': 7.968384110440961}. Best is trial 40 with value: 0.9470599999999999.
+[I 2025-08-29 20:32:58,378] Trial 42 finished with value: 0.9469453333333332 and parameters: {'learning_rate': 0.012574166302786276, 'max_depth': 12, 'min_child_weight': 2, 'subsample': 0.9283444838795637, 'colsample_bytree': 0.6261368463606537, 'lambda': 9.342359189753976, 'alpha': 7.4298018839621855}. Best is trial 40 with value: 0.9470599999999999.
+[I 2025-08-29 20:57:52,166] Trial 43 finished with value: 0.9469453333333334 and parameters: {'learning_rate': 0.011408597840213305, 'max_depth': 12, 'min_child_weight': 2, 'subsample': 0.9011895513905249, 'colsample_bytree': 0.6356310765244443, 'lambda': 5.65806304853033, 'alpha': 9.472318906781783}. Best is trial 40 with value: 0.9470599999999999.
+[I 2025-08-29 21:23:48,092] Trial 44 finished with value: 0.9468026666666667 and parameters: {'learning_rate': 0.010159427424289734, 'max_depth': 12, 'min_child_weight': 2, 'subsample': 0.8631000001373565, 'colsample_bytree': 0.6413357720372168, 'lambda': 4.42042712896516, 'alpha': 9.72168341362195}. Best is trial 40 with value: 0.9470599999999999.
+[I 2025-08-29 21:38:03,856] Trial 45 finished with value: 0.9468426666666666 and parameters: {'learning_rate': 0.01681422061175694, 'max_depth': 12, 'min_child_weight': 1, 'subsample': 0.892288596923929, 'colsample_bytree': 0.7191050177151016, 'lambda': 4.767887842331633, 'alpha': 4.16619412800744}. Best is trial 40 with value: 0.9470599999999999.
+[I 2025-08-29 22:01:22,291] Trial 46 finished with value: 0.9469146666666666 and parameters: {'learning_rate': 0.011408729006437945, 'max_depth': 11, 'min_child_weight': 2, 'subsample': 0.9810993629123734, 'colsample_bytree': 0.758448094424741, 'lambda': 2.567872558168273, 'alpha': 1.9339288306381859}. Best is trial 40 with value: 0.9470599999999999.
+[I 2025-08-29 22:17:05,781] Trial 47 finished with value: 0.946908 and parameters: {'learning_rate': 0.015745869154680594, 'max_depth': 12, 'min_child_weight': 1, 'subsample': 0.9082609139345016, 'colsample_bytree': 0.6850005716197145, 'lambda': 6.902747764395386, 'alpha': 3.469057047048791}. Best is trial 40 with value: 0.9470599999999999.
+[I 2025-08-29 22:40:42,913] Trial 48 finished with value: 0.9468799999999999 and parameters: {'learning_rate': 0.011361682670424618, 'max_depth': 11, 'min_child_weight': 2, 'subsample': 0.8027792132091912, 'colsample_bytree': 0.5914858160811214, 'lambda': 3.4051345204126475, 'alpha': 5.564096052206224}. Best is trial 40 with value: 0.9470599999999999.
+[I 2025-08-29 22:55:00,314] Trial 49 finished with value: 0.9469106666666667 and parameters: {'learning_rate': 0.019325211409701816, 'max_depth': 12, 'min_child_weight': 3, 'subsample': 0.8464029602791487, 'colsample_bytree': 0.5569203276751774, 'lambda': 1.447149417814887, 'alpha': 9.770897494900193}. Best is trial 40 with value: 0.9470599999999999.</code></pre>
+</div>
+</div>
+</section>
+<section id="real-fit-and-predict" class="level1">
+<h1>Real fit and predict</h1>
+<div id="d1989adb-4489-4709-b61f-be91197eaacc" class="cell" data-execution_count="59">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>xgb_model <span class="op">=</span> xgb.XGBClassifier(<span class="op">**</span>XGB_PARAMS)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>xgb_model.fit(X, y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="59">
+<style>#sk-container-id-2 {
+  /* Definition of color scheme common for light and dark mode */
+  --sklearn-color-text: #000;
+  --sklearn-color-text-muted: #666;
+  --sklearn-color-line: gray;
+  /* Definition of color scheme for unfitted estimators */
+  --sklearn-color-unfitted-level-0: #fff5e6;
+  --sklearn-color-unfitted-level-1: #f6e4d2;
+  --sklearn-color-unfitted-level-2: #ffe0b3;
+  --sklearn-color-unfitted-level-3: chocolate;
+  /* Definition of color scheme for fitted estimators */
+  --sklearn-color-fitted-level-0: #f0f8ff;
+  --sklearn-color-fitted-level-1: #d4ebff;
+  --sklearn-color-fitted-level-2: #b3dbfd;
+  --sklearn-color-fitted-level-3: cornflowerblue;
+
+  /* Specific color for light theme */
+  --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
+  --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-icon: #696969;
+
+  @media (prefers-color-scheme: dark) {
+    /* Redefinition of color scheme for dark theme */
+    --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
+    --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-icon: #878787;
+  }
+}
+
+#sk-container-id-2 {
+  color: var(--sklearn-color-text);
+}
+
+#sk-container-id-2 pre {
+  padding: 0;
+}
+
+#sk-container-id-2 input.sk-hidden--visually {
+  border: 0;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+#sk-container-id-2 div.sk-dashed-wrapped {
+  border: 1px dashed var(--sklearn-color-line);
+  margin: 0 0.4em 0.5em 0.4em;
+  box-sizing: border-box;
+  padding-bottom: 0.4em;
+  background-color: var(--sklearn-color-background);
+}
+
+#sk-container-id-2 div.sk-container {
+  /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
+     but bootstrap.min.css set `[hidden] { display: none !important; }`
+     so we also need the `!important` here to be able to override the
+     default hidden behavior on the sphinx rendered scikit-learn.org.
+     See: https://github.com/scikit-learn/scikit-learn/issues/21755 */
+  display: inline-block !important;
+  position: relative;
+}
+
+#sk-container-id-2 div.sk-text-repr-fallback {
+  display: none;
+}
+
+div.sk-parallel-item,
+div.sk-serial,
+div.sk-item {
+  /* draw centered vertical line to link estimators */
+  background-image: linear-gradient(var(--sklearn-color-text-on-default-background), var(--sklearn-color-text-on-default-background));
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+/* Parallel-specific style estimator block */
+
+#sk-container-id-2 div.sk-parallel-item::after {
+  content: "";
+  width: 100%;
+  border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
+  flex-grow: 1;
+}
+
+#sk-container-id-2 div.sk-parallel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background-color: var(--sklearn-color-background);
+  position: relative;
+}
+
+#sk-container-id-2 div.sk-parallel-item {
+  display: flex;
+  flex-direction: column;
+}
+
+#sk-container-id-2 div.sk-parallel-item:first-child::after {
+  align-self: flex-end;
+  width: 50%;
+}
+
+#sk-container-id-2 div.sk-parallel-item:last-child::after {
+  align-self: flex-start;
+  width: 50%;
+}
+
+#sk-container-id-2 div.sk-parallel-item:only-child::after {
+  width: 0;
+}
+
+/* Serial-specific style estimator block */
+
+#sk-container-id-2 div.sk-serial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--sklearn-color-background);
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+
+/* Toggleable style: style used for estimator/Pipeline/ColumnTransformer box that is
+clickable and can be expanded/collapsed.
+- Pipeline and ColumnTransformer use this feature and define the default style
+- Estimators will overwrite some part of the style using the `sk-estimator` class
+*/
+
+/* Pipeline and ColumnTransformer style (default) */
+
+#sk-container-id-2 div.sk-toggleable {
+  /* Default theme specific background. It is overwritten whether we have a
+  specific estimator or a Pipeline/ColumnTransformer */
+  background-color: var(--sklearn-color-background);
+}
+
+/* Toggleable label */
+#sk-container-id-2 label.sk-toggleable__label {
+  cursor: pointer;
+  display: flex;
+  width: 100%;
+  margin-bottom: 0;
+  padding: 0.5em;
+  box-sizing: border-box;
+  text-align: center;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+
+#sk-container-id-2 label.sk-toggleable__label .caption {
+  font-size: 0.6rem;
+  font-weight: lighter;
+  color: var(--sklearn-color-text-muted);
+}
+
+#sk-container-id-2 label.sk-toggleable__label-arrow:before {
+  /* Arrow on the left of the label */
+  content: "▸";
+  float: left;
+  margin-right: 0.25em;
+  color: var(--sklearn-color-icon);
+}
+
+#sk-container-id-2 label.sk-toggleable__label-arrow:hover:before {
+  color: var(--sklearn-color-text);
+}
+
+/* Toggleable content - dropdown */
+
+#sk-container-id-2 div.sk-toggleable__content {
+  display: none;
+  text-align: left;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-2 div.sk-toggleable__content.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-2 div.sk-toggleable__content pre {
+  margin: 0.2em;
+  border-radius: 0.25em;
+  color: var(--sklearn-color-text);
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-2 div.sk-toggleable__content.fitted pre {
+  /* unfitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-2 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+  /* Expand drop-down */
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+#sk-container-id-2 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+  content: "▾";
+}
+
+/* Pipeline/ColumnTransformer-specific style */
+
+#sk-container-id-2 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-2 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator-specific style */
+
+/* Colorize estimator box */
+#sk-container-id-2 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-2 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+#sk-container-id-2 div.sk-label label.sk-toggleable__label,
+#sk-container-id-2 div.sk-label label {
+  /* The background is the default theme color */
+  color: var(--sklearn-color-text-on-default-background);
+}
+
+/* On hover, darken the color of the background */
+#sk-container-id-2 div.sk-label:hover label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+/* Label box, darken color on hover, fitted */
+#sk-container-id-2 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator label */
+
+#sk-container-id-2 div.sk-label label {
+  font-family: monospace;
+  font-weight: bold;
+  display: inline-block;
+  line-height: 1.2em;
+}
+
+#sk-container-id-2 div.sk-label-container {
+  text-align: center;
+}
+
+/* Estimator-specific */
+#sk-container-id-2 div.sk-estimator {
+  font-family: monospace;
+  border: 1px dotted var(--sklearn-color-border-box);
+  border-radius: 0.25em;
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-2 div.sk-estimator.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+/* on hover */
+#sk-container-id-2 div.sk-estimator:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-2 div.sk-estimator.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Specification for estimator info (e.g. "i" and "?") */
+
+/* Common style for "i" and "?" */
+
+.sk-estimator-doc-link,
+a:link.sk-estimator-doc-link,
+a:visited.sk-estimator-doc-link {
+  float: right;
+  font-size: smaller;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1em;
+  height: 1em;
+  width: 1em;
+  text-decoration: none !important;
+  margin-left: 0.5em;
+  text-align: center;
+  /* unfitted */
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-1);
+}
+
+.sk-estimator-doc-link.fitted,
+a:link.sk-estimator-doc-link.fitted,
+a:visited.sk-estimator-doc-link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+div.sk-estimator:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover,
+div.sk-label-container:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+div.sk-estimator.fitted:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover,
+div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+/* Span, style for the box shown on hovering the info icon */
+.sk-estimator-doc-link span {
+  display: none;
+  z-index: 9999;
+  position: relative;
+  font-weight: normal;
+  right: .2ex;
+  padding: .5ex;
+  margin: .5ex;
+  width: min-content;
+  min-width: 20ex;
+  max-width: 50ex;
+  color: var(--sklearn-color-text);
+  box-shadow: 2pt 2pt 4pt #999;
+  /* unfitted */
+  background: var(--sklearn-color-unfitted-level-0);
+  border: .5pt solid var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted span {
+  /* fitted */
+  background: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3);
+}
+
+.sk-estimator-doc-link:hover span {
+  display: block;
+}
+
+/* "?"-specific style due to the `<a>` HTML tag */
+
+#sk-container-id-2 a.estimator_doc_link {
+  float: right;
+  font-size: 1rem;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1rem;
+  height: 1rem;
+  width: 1rem;
+  text-decoration: none;
+  /* unfitted */
+  color: var(--sklearn-color-unfitted-level-1);
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+}
+
+#sk-container-id-2 a.estimator_doc_link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+#sk-container-id-2 a.estimator_doc_link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+#sk-container-id-2 a.estimator_doc_link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+}
+
+.estimator-table summary {
+    padding: .5rem;
+    font-family: monospace;
+    cursor: pointer;
+}
+
+.estimator-table details[open] {
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+    padding-bottom: 0.3rem;
+}
+
+.estimator-table .parameters-table {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.estimator-table .parameters-table tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+.estimator-table .parameters-table tr:nth-child(even) {
+    background-color: #f6f6f6;
+}
+
+.estimator-table .parameters-table tr:hover {
+    background-color: #e0e0e0;
+}
+
+.estimator-table table td {
+    border: 1px solid rgba(106, 105, 104, 0.232);
+}
+
+.user-set td {
+    color:rgb(255, 94, 0);
+    text-align: left;
+}
+
+.user-set td.value pre {
+    color:rgb(255, 94, 0) !important;
+    background-color: transparent !important;
+}
+
+.default td {
+    color: black;
+    text-align: left;
+}
+
+.user-set td i,
+.default td i {
+    color: black;
+}
+
+.copy-paste-icon {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjUgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTIwOCAwTDMzMi4xIDBjMTIuNyAwIDI0LjkgNS4xIDMzLjkgMTQuMWw2Ny45IDY3LjljOSA5IDE0LjEgMjEuMiAxNC4xIDMzLjlMNDQ4IDMzNmMwIDI2LjUtMjEuNSA0OC00OCA0OGwtMTkyIDBjLTI2LjUgMC00OC0yMS41LTQ4LTQ4bDAtMjg4YzAtMjYuNSAyMS41LTQ4IDQ4LTQ4ek00OCAxMjhsODAgMCAwIDY0LTY0IDAgMCAyNTYgMTkyIDAgMC0zMiA2NCAwIDAgNDhjMCAyNi41LTIxLjUgNDgtNDggNDhMNDggNTEyYy0yNi41IDAtNDgtMjEuNS00OC00OEwwIDE3NmMwLTI2LjUgMjEuNS00OCA0OC00OHoiLz48L3N2Zz4=);
+    background-repeat: no-repeat;
+    background-size: 14px 14px;
+    background-position: 0;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+</style><div id="sk-container-id-2" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>XGBClassifier(alpha=9.887504768278703, base_score=None, booster=None,
+              callbacks=None, colsample_bylevel=None, colsample_bynode=None,
+              colsample_bytree=0.5923810290583817, device=None,
+              early_stopping_rounds=None, enable_categorical=False,
+              eval_metric=None, feature_types=None, feature_weights=None,
+              gamma=None, grow_policy=None, importance_type=None,
+              interaction_constraints=None, lambda=3.53548926977333,
+              learning_rate=0.012617622233602157, max_bin=None,
+              max_cat_threshold=None, max_cat_to_onehot=None,
+              max_delta_step=None, max_depth=12, max_leaves=None,
+              min_child_weight=2, missing=nan, monotone_constraints=None,
+              multi_strategy=None, n_estimators=None, ...)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" checked=""><label for="sk-estimator-id-2" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>XGBClassifier</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://xgboost.readthedocs.io/en/release_3.0.0/python/python_api.html#xgboost.XGBClassifier">?<span>Documentation for XGBClassifier</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
+        <div class="estimator-table">
+            <details>
+                <summary>Parameters</summary>
+                
+<table class="parameters-table table table-sm table-striped small" data-quarto-postprocess="true">
+<tbody>
+<tr class="odd default">
+<td><em></em></td>
+<td class="param">objective&nbsp;</td>
+<td class="value">'binary:logistic'</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">base_score&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">booster&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">callbacks&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">colsample_bylevel&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">colsample_bynode&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">colsample_bytree&nbsp;</td>
+<td class="value">0.5923810290583817</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">device&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">early_stopping_rounds&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">enable_categorical&nbsp;</td>
+<td class="value">False</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">eval_metric&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">feature_types&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">feature_weights&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">gamma&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">grow_policy&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">importance_type&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">interaction_constraints&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">learning_rate&nbsp;</td>
+<td class="value">0.012617622233602157</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">max_bin&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">max_cat_threshold&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">max_cat_to_onehot&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">max_delta_step&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">max_depth&nbsp;</td>
+<td class="value">12</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">max_leaves&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">min_child_weight&nbsp;</td>
+<td class="value">2</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">missing&nbsp;</td>
+<td class="value">nan</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">monotone_constraints&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">multi_strategy&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">n_estimators&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">n_jobs&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">num_parallel_tree&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">random_state&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">reg_alpha&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">reg_lambda&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">sampling_method&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">scale_pos_weight&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">subsample&nbsp;</td>
+<td class="value">0.9322099102829974</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">tree_method&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">validate_parameters&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">verbosity&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">lambda&nbsp;</td>
+<td class="value">3.53548926977333</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">alpha&nbsp;</td>
+<td class="value">9.887504768278703</td>
+</tr>
+</tbody>
+</table>
+
+            </details>
+        </div>
+    </div></div></div></div></div><script>function copyToClipboard(text, element) {
+    // Get the parameter prefix from the closest toggleable content
+    const toggleableContent = element.closest('.sk-toggleable__content');
+    const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+    const fullParamName = paramPrefix ? `${paramPrefix}${text}` : text;
+
+    const originalStyle = element.style;
+    const computedStyle = window.getComputedStyle(element);
+    const originalWidth = computedStyle.width;
+    const originalHTML = element.innerHTML.replace('Copied!', '');
+
+    navigator.clipboard.writeText(fullParamName)
+        .then(() => {
+            element.style.width = originalWidth;
+            element.style.color = 'green';
+            element.innerHTML = "Copied!";
+
+            setTimeout(() => {
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 2000);
+        })
+        .catch(err => {
+            console.error('Failed to copy:', err);
+            element.style.color = 'red';
+            element.innerHTML = "Failed!";
+            setTimeout(() => {
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 2000);
+        });
+    return false;
+}
+
+document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
+    const toggleableContent = element.closest('.sk-toggleable__content');
+    const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+    const paramName = element.parentElement.nextElementSibling.textContent.trim();
+    const fullParamName = paramPrefix ? `${paramPrefix}${paramName}` : paramName;
+
+    element.setAttribute('title', fullParamName);
+});
+</script>
+</div>
+</div>
+<div id="f5ed505d-be03-48f3-bd9c-49711310a5cf" class="cell" data-execution_count="71">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>lgbm_model <span class="op">=</span> LGBMClassifier(<span class="op">**</span>LGBM_PARAMS)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>lgbm_model.fit(X, y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[LightGBM] [Info] Number of positive: 90488, number of negative: 659512
+[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.021573 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
+[LightGBM] [Info] Total Bins 2684
+[LightGBM] [Info] Number of data points in the train set: 750000, number of used features: 51
+[LightGBM] [Info] [binary:BoostFromScore]: pavg=0.120651 -&gt; initscore=-1.986283
+[LightGBM] [Info] Start training from score -1.986283</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="71">
+<style>#sk-container-id-3 {
+  /* Definition of color scheme common for light and dark mode */
+  --sklearn-color-text: #000;
+  --sklearn-color-text-muted: #666;
+  --sklearn-color-line: gray;
+  /* Definition of color scheme for unfitted estimators */
+  --sklearn-color-unfitted-level-0: #fff5e6;
+  --sklearn-color-unfitted-level-1: #f6e4d2;
+  --sklearn-color-unfitted-level-2: #ffe0b3;
+  --sklearn-color-unfitted-level-3: chocolate;
+  /* Definition of color scheme for fitted estimators */
+  --sklearn-color-fitted-level-0: #f0f8ff;
+  --sklearn-color-fitted-level-1: #d4ebff;
+  --sklearn-color-fitted-level-2: #b3dbfd;
+  --sklearn-color-fitted-level-3: cornflowerblue;
+
+  /* Specific color for light theme */
+  --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
+  --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-icon: #696969;
+
+  @media (prefers-color-scheme: dark) {
+    /* Redefinition of color scheme for dark theme */
+    --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
+    --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-icon: #878787;
+  }
+}
+
+#sk-container-id-3 {
+  color: var(--sklearn-color-text);
+}
+
+#sk-container-id-3 pre {
+  padding: 0;
+}
+
+#sk-container-id-3 input.sk-hidden--visually {
+  border: 0;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+#sk-container-id-3 div.sk-dashed-wrapped {
+  border: 1px dashed var(--sklearn-color-line);
+  margin: 0 0.4em 0.5em 0.4em;
+  box-sizing: border-box;
+  padding-bottom: 0.4em;
+  background-color: var(--sklearn-color-background);
+}
+
+#sk-container-id-3 div.sk-container {
+  /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
+     but bootstrap.min.css set `[hidden] { display: none !important; }`
+     so we also need the `!important` here to be able to override the
+     default hidden behavior on the sphinx rendered scikit-learn.org.
+     See: https://github.com/scikit-learn/scikit-learn/issues/21755 */
+  display: inline-block !important;
+  position: relative;
+}
+
+#sk-container-id-3 div.sk-text-repr-fallback {
+  display: none;
+}
+
+div.sk-parallel-item,
+div.sk-serial,
+div.sk-item {
+  /* draw centered vertical line to link estimators */
+  background-image: linear-gradient(var(--sklearn-color-text-on-default-background), var(--sklearn-color-text-on-default-background));
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+/* Parallel-specific style estimator block */
+
+#sk-container-id-3 div.sk-parallel-item::after {
+  content: "";
+  width: 100%;
+  border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
+  flex-grow: 1;
+}
+
+#sk-container-id-3 div.sk-parallel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background-color: var(--sklearn-color-background);
+  position: relative;
+}
+
+#sk-container-id-3 div.sk-parallel-item {
+  display: flex;
+  flex-direction: column;
+}
+
+#sk-container-id-3 div.sk-parallel-item:first-child::after {
+  align-self: flex-end;
+  width: 50%;
+}
+
+#sk-container-id-3 div.sk-parallel-item:last-child::after {
+  align-self: flex-start;
+  width: 50%;
+}
+
+#sk-container-id-3 div.sk-parallel-item:only-child::after {
+  width: 0;
+}
+
+/* Serial-specific style estimator block */
+
+#sk-container-id-3 div.sk-serial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--sklearn-color-background);
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+
+/* Toggleable style: style used for estimator/Pipeline/ColumnTransformer box that is
+clickable and can be expanded/collapsed.
+- Pipeline and ColumnTransformer use this feature and define the default style
+- Estimators will overwrite some part of the style using the `sk-estimator` class
+*/
+
+/* Pipeline and ColumnTransformer style (default) */
+
+#sk-container-id-3 div.sk-toggleable {
+  /* Default theme specific background. It is overwritten whether we have a
+  specific estimator or a Pipeline/ColumnTransformer */
+  background-color: var(--sklearn-color-background);
+}
+
+/* Toggleable label */
+#sk-container-id-3 label.sk-toggleable__label {
+  cursor: pointer;
+  display: flex;
+  width: 100%;
+  margin-bottom: 0;
+  padding: 0.5em;
+  box-sizing: border-box;
+  text-align: center;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+
+#sk-container-id-3 label.sk-toggleable__label .caption {
+  font-size: 0.6rem;
+  font-weight: lighter;
+  color: var(--sklearn-color-text-muted);
+}
+
+#sk-container-id-3 label.sk-toggleable__label-arrow:before {
+  /* Arrow on the left of the label */
+  content: "▸";
+  float: left;
+  margin-right: 0.25em;
+  color: var(--sklearn-color-icon);
+}
+
+#sk-container-id-3 label.sk-toggleable__label-arrow:hover:before {
+  color: var(--sklearn-color-text);
+}
+
+/* Toggleable content - dropdown */
+
+#sk-container-id-3 div.sk-toggleable__content {
+  display: none;
+  text-align: left;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-3 div.sk-toggleable__content.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-3 div.sk-toggleable__content pre {
+  margin: 0.2em;
+  border-radius: 0.25em;
+  color: var(--sklearn-color-text);
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-3 div.sk-toggleable__content.fitted pre {
+  /* unfitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-3 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+  /* Expand drop-down */
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+#sk-container-id-3 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+  content: "▾";
+}
+
+/* Pipeline/ColumnTransformer-specific style */
+
+#sk-container-id-3 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-3 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator-specific style */
+
+/* Colorize estimator box */
+#sk-container-id-3 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-3 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+#sk-container-id-3 div.sk-label label.sk-toggleable__label,
+#sk-container-id-3 div.sk-label label {
+  /* The background is the default theme color */
+  color: var(--sklearn-color-text-on-default-background);
+}
+
+/* On hover, darken the color of the background */
+#sk-container-id-3 div.sk-label:hover label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+/* Label box, darken color on hover, fitted */
+#sk-container-id-3 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator label */
+
+#sk-container-id-3 div.sk-label label {
+  font-family: monospace;
+  font-weight: bold;
+  display: inline-block;
+  line-height: 1.2em;
+}
+
+#sk-container-id-3 div.sk-label-container {
+  text-align: center;
+}
+
+/* Estimator-specific */
+#sk-container-id-3 div.sk-estimator {
+  font-family: monospace;
+  border: 1px dotted var(--sklearn-color-border-box);
+  border-radius: 0.25em;
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-3 div.sk-estimator.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+/* on hover */
+#sk-container-id-3 div.sk-estimator:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-3 div.sk-estimator.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Specification for estimator info (e.g. "i" and "?") */
+
+/* Common style for "i" and "?" */
+
+.sk-estimator-doc-link,
+a:link.sk-estimator-doc-link,
+a:visited.sk-estimator-doc-link {
+  float: right;
+  font-size: smaller;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1em;
+  height: 1em;
+  width: 1em;
+  text-decoration: none !important;
+  margin-left: 0.5em;
+  text-align: center;
+  /* unfitted */
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-1);
+}
+
+.sk-estimator-doc-link.fitted,
+a:link.sk-estimator-doc-link.fitted,
+a:visited.sk-estimator-doc-link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+div.sk-estimator:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover,
+div.sk-label-container:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+div.sk-estimator.fitted:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover,
+div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+/* Span, style for the box shown on hovering the info icon */
+.sk-estimator-doc-link span {
+  display: none;
+  z-index: 9999;
+  position: relative;
+  font-weight: normal;
+  right: .2ex;
+  padding: .5ex;
+  margin: .5ex;
+  width: min-content;
+  min-width: 20ex;
+  max-width: 50ex;
+  color: var(--sklearn-color-text);
+  box-shadow: 2pt 2pt 4pt #999;
+  /* unfitted */
+  background: var(--sklearn-color-unfitted-level-0);
+  border: .5pt solid var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted span {
+  /* fitted */
+  background: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3);
+}
+
+.sk-estimator-doc-link:hover span {
+  display: block;
+}
+
+/* "?"-specific style due to the `<a>` HTML tag */
+
+#sk-container-id-3 a.estimator_doc_link {
+  float: right;
+  font-size: 1rem;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1rem;
+  height: 1rem;
+  width: 1rem;
+  text-decoration: none;
+  /* unfitted */
+  color: var(--sklearn-color-unfitted-level-1);
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+}
+
+#sk-container-id-3 a.estimator_doc_link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+#sk-container-id-3 a.estimator_doc_link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+#sk-container-id-3 a.estimator_doc_link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+}
+
+.estimator-table summary {
+    padding: .5rem;
+    font-family: monospace;
+    cursor: pointer;
+}
+
+.estimator-table details[open] {
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+    padding-bottom: 0.3rem;
+}
+
+.estimator-table .parameters-table {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.estimator-table .parameters-table tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+.estimator-table .parameters-table tr:nth-child(even) {
+    background-color: #f6f6f6;
+}
+
+.estimator-table .parameters-table tr:hover {
+    background-color: #e0e0e0;
+}
+
+.estimator-table table td {
+    border: 1px solid rgba(106, 105, 104, 0.232);
+}
+
+.user-set td {
+    color:rgb(255, 94, 0);
+    text-align: left;
+}
+
+.user-set td.value pre {
+    color:rgb(255, 94, 0) !important;
+    background-color: transparent !important;
+}
+
+.default td {
+    color: black;
+    text-align: left;
+}
+
+.user-set td i,
+.default td i {
+    color: black;
+}
+
+.copy-paste-icon {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjUgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTIwOCAwTDMzMi4xIDBjMTIuNyAwIDI0LjkgNS4xIDMzLjkgMTQuMWw2Ny45IDY3LjljOSA5IDE0LjEgMjEuMiAxNC4xIDMzLjlMNDQ4IDMzNmMwIDI2LjUtMjEuNSA0OC00OCA0OGwtMTkyIDBjLTI2LjUgMC00OC0yMS41LTQ4LTQ4bDAtMjg4YzAtMjYuNSAyMS41LTQ4IDQ4LTQ4ek00OCAxMjhsODAgMCAwIDY0LTY0IDAgMCAyNTYgMTkyIDAgMC0zMiA2NCAwIDAgNDhjMCAyNi41LTIxLjUgNDgtNDggNDhMNDggNTEyYy0yNi41IDAtNDgtMjEuNS00OC00OEwwIDE3NmMwLTI2LjUgMjEuNS00OCA0OC00OHoiLz48L3N2Zz4=);
+    background-repeat: no-repeat;
+    background-size: 14px 14px;
+    background-position: 0;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+</style><div id="sk-container-id-3" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>LGBMClassifier(colsample_bytree=0.5034702091158328,
+               learning_rate=0.010993029261461581, max_depth=14, num_leaves=184,
+               reg_alpha=4.769004163898552e-07, reg_lambda=1.1705377538088118,
+               subsample=0.6279321105503699)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox" checked=""><label for="sk-estimator-id-3" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>LGBMClassifier</div></div><div><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
+        <div class="estimator-table">
+            <details>
+                <summary>Parameters</summary>
+                
+<table class="parameters-table table table-sm table-striped small" data-quarto-postprocess="true">
+<tbody>
+<tr class="odd default">
+<td><em></em></td>
+<td class="param">boosting_type&nbsp;</td>
+<td class="value">'gbdt'</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">num_leaves&nbsp;</td>
+<td class="value">184</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">max_depth&nbsp;</td>
+<td class="value">14</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">learning_rate&nbsp;</td>
+<td class="value">0.010993029261461581</td>
+</tr>
+<tr class="odd default">
+<td><em></em></td>
+<td class="param">n_estimators&nbsp;</td>
+<td class="value">100</td>
+</tr>
+<tr class="even default">
+<td><em></em></td>
+<td class="param">subsample_for_bin&nbsp;</td>
+<td class="value">200000</td>
+</tr>
+<tr class="odd default">
+<td><em></em></td>
+<td class="param">objective&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even default">
+<td><em></em></td>
+<td class="param">class_weight&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd default">
+<td><em></em></td>
+<td class="param">min_split_gain&nbsp;</td>
+<td class="value">0.0</td>
+</tr>
+<tr class="even default">
+<td><em></em></td>
+<td class="param">min_child_weight&nbsp;</td>
+<td class="value">0.001</td>
+</tr>
+<tr class="odd default">
+<td><em></em></td>
+<td class="param">min_child_samples&nbsp;</td>
+<td class="value">20</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">subsample&nbsp;</td>
+<td class="value">0.6279321105503699</td>
+</tr>
+<tr class="odd default">
+<td><em></em></td>
+<td class="param">subsample_freq&nbsp;</td>
+<td class="value">0</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">colsample_bytree&nbsp;</td>
+<td class="value">0.5034702091158328</td>
+</tr>
+<tr class="odd user-set">
+<td><em></em></td>
+<td class="param">reg_alpha&nbsp;</td>
+<td class="value">4.769004163898552e-07</td>
+</tr>
+<tr class="even user-set">
+<td><em></em></td>
+<td class="param">reg_lambda&nbsp;</td>
+<td class="value">1.1705377538088118</td>
+</tr>
+<tr class="odd default">
+<td><em></em></td>
+<td class="param">random_state&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="even default">
+<td><em></em></td>
+<td class="param">n_jobs&nbsp;</td>
+<td class="value">None</td>
+</tr>
+<tr class="odd default">
+<td><em></em></td>
+<td class="param">importance_type&nbsp;</td>
+<td class="value">'split'</td>
+</tr>
+</tbody>
+</table>
+
+            </details>
+        </div>
+    </div></div></div></div></div><script>function copyToClipboard(text, element) {
+    // Get the parameter prefix from the closest toggleable content
+    const toggleableContent = element.closest('.sk-toggleable__content');
+    const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+    const fullParamName = paramPrefix ? `${paramPrefix}${text}` : text;
+
+    const originalStyle = element.style;
+    const computedStyle = window.getComputedStyle(element);
+    const originalWidth = computedStyle.width;
+    const originalHTML = element.innerHTML.replace('Copied!', '');
+
+    navigator.clipboard.writeText(fullParamName)
+        .then(() => {
+            element.style.width = originalWidth;
+            element.style.color = 'green';
+            element.innerHTML = "Copied!";
+
+            setTimeout(() => {
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 2000);
+        })
+        .catch(err => {
+            console.error('Failed to copy:', err);
+            element.style.color = 'red';
+            element.innerHTML = "Failed!";
+            setTimeout(() => {
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 2000);
+        });
+    return false;
+}
+
+document.querySelectorAll('.fa-regular.fa-copy').forEach(function(element) {
+    const toggleableContent = element.closest('.sk-toggleable__content');
+    const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+    const paramName = element.parentElement.nextElementSibling.textContent.trim();
+    const fullParamName = paramPrefix ? `${paramPrefix}${paramName}` : paramName;
+
+    element.setAttribute('title', fullParamName);
+});
+</script>
+</div>
+</div>
+</section>
+<section id="predict-on-test-data" class="level1">
+<h1>Predict on test data</h1>
+<div id="f2b80f84-a3cd-4d6c-8213-95c02111a759" class="cell" data-execution_count="73">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>X_test <span class="op">=</span> pd.read_csv(<span class="st">'X_test_FE.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="bb9180bc-39d6-4d48-9dd2-a5ad75537638" class="cell" data-execution_count="75">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>y_test_lgbm <span class="op">=</span> lgbm_model.predict_proba(X_test)[:, <span class="dv">1</span>]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>y_test_xgb <span class="op">=</span> xgb_model.predict_proba(X_test)[:, <span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="84c6fafd-a224-4c5e-b4ab-87abd239c1c7" class="cell" data-execution_count="81">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>submission_df_format <span class="op">=</span> pd.read_csv(<span class="st">'submission2.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="8978e322-6000-4e27-94b0-06c16d86f608" class="cell" data-execution_count="83">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>submission_df_lgbm <span class="op">=</span> submission_df_format.copy()</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>submission_df_lgbm[<span class="st">'y'</span>] <span class="op">=</span> y_test_lgbm</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>submission_df_xgb <span class="op">=</span> submission_df_format.copy()</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>submission_df_xgb[<span class="st">'y'</span>] <span class="op">=</span> y_test_xgb</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="458e7426-9134-4cc3-9a5c-cbed695d78ce" class="cell" data-execution_count="85">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>submission_df_lgbm.to_csv(<span class="st">'submission4.csv'</span>, index <span class="op">=</span> <span class="va">False</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>submission_df_xgb.to_csv(<span class="st">'submission5.csv'</span>, index <span class="op">=</span> <span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
