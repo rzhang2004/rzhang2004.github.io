@@ -289,6 +289,24 @@
             background: #edf2f7;
         }
 
+        .results-table .link-cell {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .results-table .link-cell a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .results-table .link-cell a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
         .error-message {
             background: #fed7d7;
             color: #c53030;
@@ -333,6 +351,18 @@
                 display: block;
                 margin: 5px 0;
             }
+
+            .results-table {
+                font-size: 12px;
+            }
+
+            .results-table th, .results-table td {
+                padding: 8px 4px;
+            }
+
+            .results-table .link-cell {
+                max-width: 120px;
+            }
         }
     </style>
 </head>
@@ -340,12 +370,12 @@
     <div class="content">
         <section id="home">
             <h2>Ray's Portfolio</h2>
-            <p>I am an undergraduate student from San Antonio, Texas pursuing a B.A. in Data Science with a minor in Statistics and a B.M. in Viola Performance at Northwestern University (Evanston, IL). 
+            <p>My name is Ray Zhang. I am an undergraduate student from San Antonio, Texas pursuing a B.A. in Data Science with a minor in Statistics and a B.M. in Viola Performance at Northwestern University (Evanston, IL). 
                 My expected graduation date is Spring 2027. My music YouTube channel can be found <a href="https://www.youtube.com/@rayzhang4">here</a>. I also have another channel covering various concepts for Data Science <a href="https://www.youtube.com/@rzdsml">here</a>.</p>
         </section>
 
         <section id="about">
-            <h2>About Me</h2>
+            <h2>Technical Skills</h2>
             <p>I have project experience working with Python, Tableau, SQL, Docker, Kubernetes, AWS, Java, HTML, CSS, Javascript, and R. You can view my projects below.
                 I am interested in machine learning applications related to music.
                 For my resume, which details my professional experience using Python, Tableau, and SQL, please email me.</p>
@@ -366,9 +396,9 @@
                     <h4>Projects Table Schema:</h4>
                     <p><strong>Columns:</strong> <code>title</code> (TEXT), <code>date</code> (TEXT), <code>description</code> (TEXT), <code>technologies</code> (TEXT), <code>category</code> (TEXT), <code>ranking</code> (TEXT)</p>
                     <p><strong>Examples:</strong></p>
-                    <p>• <code>SELECT * FROM projects WHERE category = 'Machine Learning' ORDER BY date DESC</code></p>
+                    <p>• <code>SELECT title, category FROM projects WHERE category = 'Machine Learning' ORDER BY date DESC</code></p>
                     <p>• <code>SELECT category, COUNT(*) as count FROM projects GROUP BY category</code></p>
-                    <p>• <code>SELECT * FROM projects WHERE technologies LIKE '%Python%' AND ranking IS NOT NULL</code></p>
+                    <p>• <code>SELECT title, ranking FROM projects WHERE ranking IS NOT NULL</code></p>
                 </div>
 
                 <textarea 
@@ -376,7 +406,7 @@
                     id="sqlQuery" 
                     placeholder="Enter your SQL query here...
 Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Python%' ORDER BY date DESC"
-                >SELECT * FROM projects ORDER BY date DESC</textarea>
+                >SELECT title, date, category FROM projects ORDER BY date DESC</textarea>
 
                 <div class="sql-controls">
                     <button class="execute-btn" onclick="executeQuery()">Execute Query</button>
@@ -385,13 +415,12 @@ Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Py
 
                 <div class="example-queries">
                     <strong>Quick Examples:</strong>
-                    <div class="example-query" onclick="setQuery('SELECT * FROM projects ORDER BY date DESC')">All projects by date</div>
-                    <div class="example-query" onclick="setQuery(&quot;SELECT * FROM projects WHERE category = 'Machine Learning'&quot;)">ML projects only</div>
-                    <div class="example-query" onclick="setQuery('SELECT * FROM projects WHERE ranking IS NOT NULL')">Projects with rankings</div>
+                    <div class="example-query" onclick="setQuery('SELECT * FROM projects ORDER BY date DESC')">All projects</div>
+                    <div class="example-query" onclick="setQuery(&quot;SELECT * FROM projects WHERE category = 'Machine Learning'&quot;)">ML projects</div>
+                    <div class="example-query" onclick="setQuery('SELECT * FROM projects WHERE ranking IS NOT NULL')">Ranked projects</div>
                     <div class="example-query" onclick="setQuery(&quot;SELECT * FROM projects WHERE technologies LIKE '%Python%'&quot;)">Python projects</div>
                     <div class="example-query" onclick="setQuery('SELECT category, COUNT(*) as count FROM projects GROUP BY category')">Count by category</div>
-                    <div class="example-query" onclick="setQuery(&quot;SELECT * FROM projects WHERE category = 'Machine Learning' AND ranking IS NOT NULL&quot;)">ML with rankings</div>
-                    <div class="example-query" onclick="setQuery(&quot;SELECT title, date FROM projects WHERE technologies LIKE '%JavaScript%' OR technologies LIKE '%HTML%'&quot;)">Web dev projects</div>
+                    <div class="example-query" onclick="setQuery(&quot;SELECT * FROM projects WHERE category = 'Web Development'&quot;)">Web dev projects</div>
                 </div>
 
                 <div id="sqlResults"></div>
@@ -400,6 +429,10 @@ Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Py
 
         <section id="projects">
             <h2>All Projects</h2>
+            <div class="project">
+                <a href="Using LIME with PyTorch.html" target="_blank"><h3>LIME with Kaggle Playground S5E7 (September 2025)</h3></a>
+                <p>Using LIME (Local Interpretable Model-agnostic Explanations) on a PyTorch neural network.</p>
+            </div>
             <div class="project">
                 <a href="Fine Tuning.html" target="_blank"><h3>Apartment GPT (September 2025)</h3></a>
                 <p>Fine-Tuning TinyLlama with QLoRA using tokens generated from various anonymized apartment policy documents. Deployed on Hugging Face hub.</p>
@@ -453,15 +486,25 @@ Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Py
     </div>
 
     <script>
-        // Project data structured for SQL queries
+        // Project data structured for SQL queries - link info is internal for title rendering
         const projectsData = [
+            {
+                title: "LIME with Kaggle Playground S5E7",
+                date: "2025-09",
+                description: "Using LIME (Local Interpretable Model-agnostic Explanations) on a PyTorch neural network.",
+                technologies: "Python, PyTorch, LIME",
+                category: "Machine Learning",
+                ranking: null,
+                _link: "Using LIME with PyTorch.html"
+            },
             {
                 title: "Apartment GPT",
                 date: "2025-09",
                 description: "Fine-Tuning TinyLlama with QLoRA using tokens generated from various anonymized apartment policy documents. Deployed on Hugging Face hub.",
                 technologies: "Python, TinyLlama, QLoRA, Hugging Face",
                 category: "Machine Learning",
-                ranking: null
+                ranking: null,
+                _link: "Fine Tuning.html"
             },
             {
                 title: "Kaggle Playground S5E8",
@@ -469,7 +512,8 @@ Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Py
                 description: "Engineered an ensemble pipeline combining a PyTorch neural network, XGBoost, and LightGBM for binary classification; achieved top 19.5% final ranking (654/3367) in a global leaderboard.",
                 technologies: "Python, PyTorch, XGBoost, LightGBM",
                 category: "Machine Learning",
-                ranking: "Top 19.5% (654/3367)"
+                ranking: "Top 19.5% (654/3367)",
+                _link: "Kaggle S5E8 Overview.html"
             },
             {
                 title: "Analyzing Clash Royale Gameplay",
@@ -477,7 +521,8 @@ Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Py
                 description: "Uses the Clash Royale API, feature engineering, logistic regression, and OpenAI API to provide strategic tips to improve gameplay and strategy.",
                 technologies: "Python, API, Logistic Regression, OpenAI API",
                 category: "Data Analysis",
-                ranking: null
+                ranking: null,
+                _link: "clashroyale.html"
             },
             {
                 title: "Analyzing \"Helplessness Blues\" By Fleet Foxes",
@@ -485,7 +530,8 @@ Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Py
                 description: "An investigation of the relationship between unorthodox song forms and increased track popularity. Completed for Music 226-3 at Northwestern University.",
                 technologies: "Python, Matplotlib, Statistical Analysis",
                 category: "Music Analysis",
-                ranking: null
+                ranking: null,
+                _link: "helplessnessbluesanalysis.html"
             },
             {
                 title: "Kaggle Playground S5E7",
@@ -493,7 +539,8 @@ Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Py
                 description: "Built a PyTorch classification model with 96.9% accuracy; achieved a final standing of 523/4329 (top 13%) in a global leaderboard.",
                 technologies: "Python, PyTorch",
                 category: "Machine Learning",
-                ranking: "Top 13% (523/4329)"
+                ranking: "Top 13% (523/4329)",
+                _link: "kagglepersonality.html"
             },
             {
                 title: "Random Excerpt Player",
@@ -501,7 +548,8 @@ Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Py
                 description: "Built a web app to play random excerpts from a linked YouTube playlist; meant to simulate listening portion of Music Theory exams. Note: only works for videos that don't have copyright restrictions due to YouTube policy.",
                 technologies: "HTML, CSS, JavaScript, YouTube API",
                 category: "Web Development",
-                ranking: null
+                ranking: null,
+                _link: "excerpt_player.html"
             },
             {
                 title: "Prime Form Calculator",
@@ -509,7 +557,8 @@ Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Py
                 description: "Prime Form Calculator for Music Theory",
                 technologies: "HTML, CSS, JavaScript",
                 category: "Web Development",
-                ranking: null
+                ranking: null,
+                _link: "prime.html"
             },
             {
                 title: "Piano Game",
@@ -517,7 +566,8 @@ Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Py
                 description: "Built a piano game using HTML/CSS/Javascript to practice for Aural Skills, a required class that is part of my music degree plan.",
                 technologies: "HTML, CSS, JavaScript",
                 category: "Web Development",
-                ranking: null
+                ranking: null,
+                _link: "piano.html"
             }
         ];
 
@@ -632,8 +682,16 @@ Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Py
                         if (col.toLowerCase().includes(' as ')) {
                             const [original, alias] = col.split(/\s+as\s+/i).map(s => s.trim());
                             newRow[alias] = row[original];
+                            // Preserve _link for title rendering
+                            if (original === 'title') {
+                                newRow['_link'] = row['_link'];
+                            }
                         } else {
                             newRow[col] = row[col];
+                            // Preserve _link for title rendering
+                            if (col === 'title') {
+                                newRow['_link'] = row['_link'];
+                            }
                         }
                     });
                     return newRow;
@@ -737,7 +795,7 @@ Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Py
                 return;
             }
 
-            const columns = Object.keys(data[0]);
+            const columns = Object.keys(data[0]).filter(col => !col.startsWith('_'));
             let html = '<div class="sql-results"><table class="results-table"><thead><tr>';
             
             columns.forEach(col => {
@@ -748,8 +806,14 @@ Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Py
             data.forEach(row => {
                 html += '<tr>';
                 columns.forEach(col => {
-                    const value = row[col] === null || row[col] === undefined ? 'NULL' : row[col];
-                    html += `<td>${value}</td>`;
+                    let value = row[col] === null || row[col] === undefined ? 'NULL' : row[col];
+                    
+                    // Special handling for title column - make it clickable if _link exists
+                    if (col === 'title' && row['_link'] && value !== 'NULL' && value !== '') {
+                        html += `<td class="link-cell"><a href="${row['_link']}" target="_blank">${value}</a></td>`;
+                    } else {
+                        html += `<td>${value}</td>`;
+                    }
                 });
                 html += '</tr>';
             });
