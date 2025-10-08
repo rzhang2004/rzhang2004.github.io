@@ -430,6 +430,10 @@ Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Py
         <section id="projects">
             <h2>All Projects</h2>
             <div class="project">
+                <a href="Spurious Correlation.html" target="_blank"><h3>Spurious Correlation #1 (October 2025)</h3></a>
+                <p>A fun investigation in the odd correlation between my winrate on Chess.com and the popularity of "Fortnite".</p>
+            </div>
+            <div class="project">
                 <a href="Using LIME with PyTorch.html" target="_blank"><h3>LIME with Kaggle Playground S5E7 (September 2025)</h3></a>
                 <p>Using LIME (Local Interpretable Model-agnostic Explanations) on a PyTorch neural network.</p>
             </div>
@@ -488,6 +492,15 @@ Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Py
     <script>
         // Project data structured for SQL queries - link info is internal for title rendering
         const projectsData = [
+            {
+                title: "Spurious Correlation #1",
+                date: "2025-10",
+                description: "A fun investigation in the odd correlation between my winrate on Chess.com and the popularity of 'Fortnite'.",
+                technologies: "Python, SpotiPy, Matplotlib",
+                category: "Fun",
+                ranking: null,
+                _link: "Spurious Correlation.html"
+            },
             {
                 title: "LIME with Kaggle Playground S5E7",
                 date: "2025-09",
