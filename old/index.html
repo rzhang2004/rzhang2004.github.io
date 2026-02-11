@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ray's Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        section {
+            background: rgba(255, 255, 255, 0.95);
+            margin: 20px 0;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 2em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: #4a5568;
+        }
+
+        a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #764ba2;
+        }
+
+        .project {
+            background: #f7fafc;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .project:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .contact-icon:hover {
+            transform: scale(1.1);
+        }
+
+        /* Scroll to Projects Section */
+        .scroll-to-projects {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+        }
+
+        .scroll-to-projects-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scroll-to-projects-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .scroll-to-projects-btn:hover::before {
+            left: 100%;
+        }
+
+        .scroll-to-projects-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .scroll-text {
+            font-size: 16px;
+        }
+
+        .scroll-arrow {
+            font-size: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-subtitle {
+            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.9);
+            font-style: italic;
+            font-size: 14px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 500;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-5px);
+            }
+            60% {
+                transform: translateY(-3px);
+            }
+        }
+
+        /* SQL Interface Styles */
+        .sql-interface {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .sql-editor {
+            width: 100%;
+            min-height: 120px;
+            background: #1a202c;
+            color: #e2e8f0;
+            border: 2px solid #4a5568;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .sql-editor:focus {
+            border-color: #667eea;
+        }
+
+        .sql-controls {
+            margin: 15px 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .execute-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .execute-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .clear-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .example-queries {
+            margin-top: 15px;
+        }
+
+        .example-query {
+            background: #4a5568;
+            padding: 8px 12px;
+            margin: 5px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-block;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+            transition: background-color 0.3s ease;
+        }
+
+        .example-query:hover {
+            background: #667eea;
+        }
+
+        .sql-results {
+            background: #f7fafc;
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .results-table th {
+            background: #4a5568;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .results-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #2d3748;
+        }
+
+        .results-table tr:hover {
+            background: #edf2f7;
+        }
+
+        .results-table .link-cell {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .results-table .link-cell a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .results-table .link-cell a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #e53e3e;
+            margin-top: 15px;
+        }
+
+        .schema-info {
+            background: #e6fffa;
+            color: #234e52;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #38b2ac;
+        }
+
+        .schema-info h4 {
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+
+        .schema-info code {
+            background: #bee3f8;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        @media (max-width: 768px) {
+            .sql-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .execute-btn, .clear-btn {
+                width: 100%;
+            }
+
+            .example-query {
+                display: block;
+                margin: 5px 0;
+            }
+
+            .results-table {
+                font-size: 12px;
+            }
+
+            .results-table th, .results-table td {
+                padding: 8px 4px;
+            }
+
+            .results-table .link-cell {
+                max-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <section id="home">
+            <h2>Ray's Portfolio</h2>
+            <p>My name is Ray Zhang. I am an undergraduate student from San Antonio, Texas pursuing a B.A. in Data Science and Mathematics and a B.M. in Viola Performance at Northwestern University (Evanston, IL). My music YouTube channel can be found <a href="https://www.youtube.com/@rayzhang4">here</a>. I also have another channel covering various concepts for Data Science <a href="https://www.youtube.com/@rzdsml">here</a>.</p>
+        </section>
+
+        <section id="about">
+            <h2>Technical Skills</h2>
+            <p>I have project experience working with Python, Tableau, SQL, Docker, Kubernetes, AWS, Java, HTML, CSS, Javascript, and R. You can view my projects below.
+                I am interested in machine learning applications related to music.
+                For my resume, which details my professional experience using Python, Tableau, and SQL, please email me.</p>
+        </section>
+
+        <div class="scroll-to-projects">
+            <button class="scroll-to-projects-btn" onclick="scrollToProjects()">
+                <span class="scroll-text">Skip to Traditional View</span>
+                <span class="scroll-arrow">↓</span>
+            </button>
+            <p class="scroll-subtitle">Or query my projects with SQL below</p>
+        </div>
+
+        <section id="sql-projects">
+            <h2>Query My Projects</h2>
+            <div class="sql-interface">
+                <div class="schema-info">
+                    <h4>Projects Table Schema:</h4>
+                    <p><strong>Columns:</strong> <code>title</code> (TEXT), <code>date</code> (TEXT), <code>description</code> (TEXT), <code>technologies</code> (TEXT), <code>category</code> (TEXT), <code>ranking</code> (TEXT)</p>
+                    <p><strong>Examples:</strong></p>
+                    <p>• <code>SELECT title, category FROM projects WHERE category = 'Machine Learning' ORDER BY date DESC</code></p>
+                    <p>• <code>SELECT category, COUNT(*) as count FROM projects GROUP BY category</code></p>
+                    <p>• <code>SELECT title, ranking FROM projects WHERE ranking IS NOT NULL</code></p>
+                </div>
+
+                <textarea 
+                    class="sql-editor" 
+                    id="sqlQuery" 
+                    placeholder="Enter your SQL query here...
+Example: SELECT title, date, category FROM projects WHERE technologies LIKE '%Python%' ORDER BY date DESC"
+                >SELECT title, date, category FROM projects ORDER BY date DESC</textarea>
+
+                <div class="sql-controls">
+                    <button class="execute-btn" onclick="executeQuery()">Execute Query</button>
+                    <button class="clear-btn" onclick="clearQuery()">Clear</button>
+                </div>
+
+                <div class="example-queries">
+                    <strong>Quick Examples:</strong>
+                    <div class="example-query" onclick="setQuery('SELECT * FROM projects ORDER BY date DESC')">All projects</div>
+                    <div class="example-query" onclick="setQuery(&quot;SELECT * FROM projects WHERE category = 'Machine Learning'&quot;)">ML projects</div>
+                    <div class="example-query" onclick="setQuery('SELECT * FROM projects WHERE ranking IS NOT NULL')">Ranked projects</div>
+                    <div class="example-query" onclick="setQuery(&quot;SELECT * FROM projects WHERE technologies LIKE '%Python%'&quot;)">Python projects</div>
+                    <div class="example-query" onclick="setQuery('SELECT category, COUNT(*) as count FROM projects GROUP BY category')">Count by category</div>
+                    <div class="example-query" onclick="setQuery(&quot;SELECT * FROM projects WHERE category = 'Web Development'&quot;)">Web dev projects</div>
+                </div>
+
+                <div id="sqlResults"></div>
+            </div>
+        </section>
+
+        <section id="projects">
+            <h2>All Projects</h2>
+            <div class="project">
+                <a href="other-pages/Spurious Correlation.html" target="_blank"><h3>Spurious Correlation #1 (October 2025)</h3></a>
+                <p>A fun investigation in the odd correlation between my winrate on Chess.com and the popularity of "Fortnite".</p>
+            </div>
+            <div class="project">
+                <a href="other-pages/LIME with PyTorch.html" target="_blank"><h3>LIME with Kaggle Playground S5E7 (September 2025)</h3></a>
+                <p>Using LIME (Local Interpretable Model-agnostic Explanations) on a PyTorch neural network.</p>
+            </div>
+            <div class="project">
+                <a href="other-pages/Fine Tuning.html" target="_blank"><h3>Apartment GPT (September 2025)</h3></a>
+                <p>Fine-Tuning TinyLlama with QLoRA using tokens generated from various anonymized apartment policy documents. Deployed on Hugging Face hub.</p>
+            </div>
+            <div class="project">
+                <a href="other-pages/Kaggle S5E8 Overview.html" target="_blank"><h3>Kaggle Playground S5E8 (August 2025)</h3></a>
+                <p>Engineered an ensemble pipeline combining a PyTorch neural network, XGBoost, and LightGBM for binary classification; achieved top 19.5% final ranking (654/3367) in a global leaderboard.</p>
+            </div>
+            <div class="project">
+                <a href="other-pages/clashroyale.html" target="_blank"><h3>Analyzing Clash Royale Gameplay (August 2025)</h3></a>
+                <p>Uses the Clash Royale API, feature engineering, logistic regression, and OpenAI API to provide strategic tips to improve gameplay and strategy.</p>
+            </div>
+            <div class="project">
+                <a href="other-pages/helplessnessbluesanalysis.html" target="_blank"><h3>Analyzing "Helplessness Blues" By Fleet Foxes (June 2025)</h3></a>
+                <p>An investigation of the relationship between unorthodox song forms and increased track popularity. Completed for Music 226-3 at Northwestern University.</p>
+            </div>
+            <div class="project">
+                <a href="other-pages/kagglepersonality.html" target="_blank"><h3>Kaggle Playground S5E7 (July 2025)</h3></a>
+                <p>Built a PyTorch classification model with 96.9% accuracy; achieved a final standing of 523/4329 (top 13%) in a global leaderboard.</p>
+            </div>
+            <div class="project">
+                <a href="other-pages/excerpt_player.html" target="_blank"><h3>Random Excerpt Player (May 2025)</h3></a>
+                <p>Built a web app to play random excerpts from a linked YouTube playlist; meant to simulate listening portion of Music Theory exams. Note: only works for videos that don't have copyright restrictions due to YouTube policy.</p>
+            </div>
+            <div class="project">
+                <a href="other-pages/prime.html" target="_blank"><h3>Prime Form Calculator (April 2025)</h3></a>
+                <p>Prime Form Calculator for Music Theory</p>
+            </div>
+            <div class="project">
+                <a href="other-pages/piano.html" target="_blank"><h3>Piano Game (July 2024)</h3></a>
+                <p>Built a piano game using HTML/CSS/Javascript to practice for Aural Skills, a required class that is part of my music degree plan.</p>
+            </div>
+        </section>
+
+        <section id="contact">
+            <div class="contact-icons">
+                <a href="https://www.linkedin.com/in/ray-zhang-852a80312/" target="_blank">
+                    <img src="linkedin.jpg" alt="LinkedIn" class="contact-icon">
+                </a>
+                <a href="mailto:rayzhang2027@u.northwestern.edu" target="_blank">
+                    <img src="gmail.png" alt="Gmail" class="contact-icon">
+                </a>
+                <a href="https://github.com/rzhang2004" target="_blank">
+                    <img src="github.png" alt="GitHub" class="contact-icon">
+                </a>
+                <a href="https://leetcode.com/u/rzhang2004/" target="_blank">
+                    <img src="leetcode.png" alt="LeetCode" class="contact-icon">
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Project data structured for SQL queries - link info is internal for title rendering
+        const projectsData = [
+            {
+                title: "Spurious Correlation #1",
+                date: "2025-10",
+                description: "A fun investigation in the odd correlation between my winrate on Chess.com and the popularity of 'Fortnite'.",
+                technologies: "Python, SpotiPy, Matplotlib",
+                category: "Data Analysis",
+                ranking: null,
+                _link: "other-pages/Spurious Correlation.html"
+            },
+            {
+                title: "LIME with Kaggle Playground S5E7",
+                date: "2025-09",
+                description: "Using LIME (Local Interpretable Model-agnostic Explanations) on a PyTorch neural network.",
+                technologies: "Python, PyTorch, LIME",
+                category: "Machine Learning",
+                ranking: null,
+                _link: "other-pages/Using LIME with PyTorch.html"
+            },
+            {
+                title: "Apartment GPT",
+                date: "2025-09",
+                description: "Fine-Tuning TinyLlama with QLoRA using tokens generated from various anonymized apartment policy documents. Deployed on Hugging Face hub.",
+                technologies: "Python, TinyLlama, QLoRA, Hugging Face",
+                category: "Machine Learning",
+                ranking: null,
+                _link: "other-pages/Fine Tuning.html"
+            },
+            {
+                title: "Kaggle Playground S5E8",
+                date: "2025-08",
+                description: "Engineered an ensemble pipeline combining a PyTorch neural network, XGBoost, and LightGBM for binary classification; achieved top 19.5% final ranking (654/3367) in a global leaderboard.",
+                technologies: "Python, PyTorch, XGBoost, LightGBM",
+                category: "Machine Learning",
+                ranking: "Top 19.5% (654/3367)",
+                _link: "other-pages/Kaggle S5E8 Overview.html"
+            },
+            {
+                title: "Analyzing Clash Royale Gameplay",
+                date: "2025-08",
+                description: "Uses the Clash Royale API, feature engineering, logistic regression, and OpenAI API to provide strategic tips to improve gameplay and strategy.",
+                technologies: "Python, API, Logistic Regression, OpenAI API",
+                category: "Data Analysis",
+                ranking: null,
+                _link: "other-pages/clashroyale.html"
+            },
+            {
+                title: "Analyzing \"Helplessness Blues\" By Fleet Foxes",
+                date: "2025-06",
+                description: "An investigation of the relationship between unorthodox song forms and increased track popularity. Completed for Music 226-3 at Northwestern University.",
+                technologies: "Python, Matplotlib, Statistical Analysis",
+                category: "Music Analysis",
+                ranking: null,
+                _link: "other-pages/helplessnessbluesanalysis.html"
+            },
+            {
+                title: "Kaggle Playground S5E7",
+                date: "2025-07",
+                description: "Built a PyTorch classification model with 96.9% accuracy; achieved a final standing of 523/4329 (top 13%) in a global leaderboard.",
+                technologies: "Python, PyTorch",
+                category: "Machine Learning",
+                ranking: "Top 13% (523/4329)",
+                _link: "other-pages/kagglepersonality.html"
+            },
+            {
+                title: "Random Excerpt Player",
+                date: "2025-05",
+                description: "Built a web app to play random excerpts from a linked YouTube playlist; meant to simulate listening portion of Music Theory exams. Note: only works for videos that don't have copyright restrictions due to YouTube policy.",
+                technologies: "HTML, CSS, JavaScript, YouTube API",
+                category: "Web Development",
+                ranking: null,
+                _link: "other-pages/excerpt_player.html"
+            },
+            {
+                title: "Prime Form Calculator",
+                date: "2025-04",
+                description: "Prime Form Calculator for Music Theory",
+                technologies: "HTML, CSS, JavaScript",
+                category: "Web Development",
+                ranking: null,
+                _link: "other-pages/prime.html"
+            },
+            {
+                title: "Piano Game",
+                date: "2024-07",
+                description: "Built a piano game using HTML/CSS/Javascript to practice for Aural Skills, a required class that is part of my music degree plan.",
+                technologies: "HTML, CSS, JavaScript",
+                category: "Web Development",
+                ranking: null,
+                _link: "other-pages/piano.html"
+            }
+        ];
+
+        // Enhanced SQL parser and executor
+        function executeQuery() {
+            const query = document.getElementById('sqlQuery').value.trim();
+            const resultsDiv = document.getElementById('sqlResults');
+
+            try {
+                const result = parseAndExecuteSQL(query, projectsData);
+                displayResults(result, resultsDiv);
+            } catch (error) {
+                displayError(error.message, resultsDiv);
+            }
+        }
+
+        function parseAndExecuteSQL(query, data) {
+            const lowerQuery = query.toLowerCase();
+            
+            if (!lowerQuery.includes('from projects')) {
+                throw new Error('Query must include "FROM projects"');
+            }
+
+            let result = [...data];
+
+            // Parse SELECT clause first to identify aggregations
+            const selectMatch = query.match(/SELECT\s+(.+?)\s+FROM/i);
+            if (!selectMatch) {
+                throw new Error('Invalid SELECT clause');
+            }
+            
+            const selectClause = selectMatch[1].trim();
+            const isAggregateQuery = /count\s*\(\s*\*?\s*\)/i.test(selectClause);
+            const hasGroupBy = /group\s+by/i.test(lowerQuery);
+
+            // Handle WHERE clause with improved logic
+            const whereMatch = lowerQuery.match(/where\s+(.+?)(?:\s+group\s+by|\s+order\s+by|$)/);
+            if (whereMatch) {
+                const whereClause = whereMatch[1].trim();
+                result = result.filter(row => evaluateWhereClause(row, whereClause));
+            }
+
+            // Handle GROUP BY clause with proper aggregation
+            if (hasGroupBy) {
+                const groupByMatch = lowerQuery.match(/group\s+by\s+(\w+)/);
+                if (groupByMatch) {
+                    const groupColumn = groupByMatch[1];
+                    const grouped = {};
+                    
+                    result.forEach(row => {
+                        const key = row[groupColumn] || 'NULL';
+                        if (!grouped[key]) {
+                            grouped[key] = [];
+                        }
+                        grouped[key].push(row);
+                    });
+
+                    // Process aggregations
+                    if (isAggregateQuery) {
+                        result = Object.keys(grouped).map(key => {
+                            const group = grouped[key];
+                            const newRow = { [groupColumn]: key === 'NULL' ? null : key };
+                            
+                            // Handle COUNT(*)
+                            if (/count\s*\(\s*\*\s*\)/i.test(selectClause)) {
+                                const countMatch = selectClause.match(/count\s*\(\s*\*\s*\)\s*(?:as\s+(\w+))?/i);
+                                const countAlias = countMatch && countMatch[1] ? countMatch[1] : 'count';
+                                newRow[countAlias] = group.length;
+                            }
+                            
+                            return newRow;
+                        });
+                    }
+                }
+            }
+
+            // Handle ORDER BY clause
+            const orderByMatch = lowerQuery.match(/order\s+by\s+(\w+)(?:\s+(asc|desc))?/);
+            if (orderByMatch) {
+                const column = orderByMatch[1];
+                const direction = orderByMatch[2] || 'asc';
+                
+                result.sort((a, b) => {
+                    let aVal = a[column];
+                    let bVal = b[column];
+                    
+                    // Handle null values
+                    if (aVal === null && bVal === null) return 0;
+                    if (aVal === null) return direction === 'desc' ? 1 : -1;
+                    if (bVal === null) return direction === 'desc' ? -1 : 1;
+                    
+                    // Handle numeric values (for COUNT results)
+                    if (typeof aVal === 'number' && typeof bVal === 'number') {
+                        return direction === 'desc' ? bVal - aVal : aVal - bVal;
+                    }
+                    
+                    // String comparison
+                    if (typeof aVal === 'string' && typeof bVal === 'string') {
+                        return direction === 'desc' ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
+                    }
+                    
+                    return 0;
+                });
+            }
+
+            // Handle SELECT clause projection (unless it's already been handled by GROUP BY)
+            if (!hasGroupBy && selectClause !== '*') {
+                const columns = selectClause.split(',').map(col => col.trim());
+                result = result.map(row => {
+                    const newRow = {};
+                    columns.forEach(col => {
+                        if (col.toLowerCase().includes(' as ')) {
+                            const [original, alias] = col.split(/\s+as\s+/i).map(s => s.trim());
+                            newRow[alias] = row[original];
+                            // Preserve _link for title rendering
+                            if (original === 'title') {
+                                newRow['_link'] = row['_link'];
+                            }
+                        } else {
+                            newRow[col] = row[col];
+                            // Preserve _link for title rendering
+                            if (col === 'title') {
+                                newRow['_link'] = row['_link'];
+                            }
+                        }
+                    });
+                    return newRow;
+                });
+            }
+
+            return result;
+        }
+
+        function evaluateWhereClause(row, clause) {
+            // Handle AND/OR operators
+            if (clause.includes(' and ') || clause.includes(' or ')) {
+                return evaluateComplexCondition(row, clause);
+            }
+            
+            return evaluateSimpleCondition(row, clause);
+        }
+
+        function evaluateComplexCondition(row, clause) {
+            // Split by OR first (lower precedence)
+            const orParts = clause.split(/\s+or\s+/i);
+            
+            for (let orPart of orParts) {
+                // Split each OR part by AND (higher precedence)
+                const andParts = orPart.trim().split(/\s+and\s+/i);
+                let allAndTrue = true;
+                
+                for (let andPart of andParts) {
+                    if (!evaluateSimpleCondition(row, andPart.trim())) {
+                        allAndTrue = false;
+                        break;
+                    }
+                }
+                
+                // If any OR branch is completely true, return true
+                if (allAndTrue) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        function evaluateSimpleCondition(row, condition) {
+            condition = condition.trim();
+            
+            // Handle LIKE operator
+            const likeMatch = condition.match(/(\w+)\s+like\s+'([^']+)'/i);
+            if (likeMatch) {
+                const [, column, pattern] = likeMatch;
+                const value = (row[column] || '').toString();
+                const regex = new RegExp(pattern.replace(/%/g, '.*'), 'i');
+                return regex.test(value);
+            }
+
+            // Handle NOT LIKE operator
+            const notLikeMatch = condition.match(/(\w+)\s+not\s+like\s+'([^']+)'/i);
+            if (notLikeMatch) {
+                const [, column, pattern] = notLikeMatch;
+                const value = (row[column] || '').toString();
+                const regex = new RegExp(pattern.replace(/%/g, '.*'), 'i');
+                return !regex.test(value);
+            }
+
+            // Handle equality
+            const eqMatch = condition.match(/(\w+)\s*=\s*'([^']*)'/i);
+            if (eqMatch) {
+                const [, column, value] = eqMatch;
+                const rowValue = (row[column] || '').toString();
+                return rowValue.toLowerCase() === value.toLowerCase();
+            }
+
+            // Handle inequality
+            const neqMatch = condition.match(/(\w+)\s*!=\s*'([^']*)'/i) || condition.match(/(\w+)\s*<>\s*'([^']*)'/i);
+            if (neqMatch) {
+                const [, column, value] = neqMatch;
+                const rowValue = (row[column] || '').toString();
+                return rowValue.toLowerCase() !== value.toLowerCase();
+            }
+
+            // Handle IS NOT NULL
+            const isNotNullMatch = condition.match(/(\w+)\s+is\s+not\s+null/i);
+            if (isNotNullMatch) {
+                const column = isNotNullMatch[1];
+                return row[column] !== null && row[column] !== undefined && row[column] !== '';
+            }
+
+            // Handle IS NULL
+            const isNullMatch = condition.match(/(\w+)\s+is\s+null/i);
+            if (isNullMatch) {
+                const column = isNullMatch[1];
+                return row[column] === null || row[column] === undefined || row[column] === '';
+            }
+
+            return true;
+        }
+
+        function displayResults(data, container) {
+            if (data.length === 0) {
+                container.innerHTML = '<div class="error-message">No results found.</div>';
+                return;
+            }
+
+            const columns = Object.keys(data[0]).filter(col => !col.startsWith('_'));
+            let html = '<div class="sql-results"><table class="results-table"><thead><tr>';
+            
+            columns.forEach(col => {
+                html += `<th>${col}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            data.forEach(row => {
+                html += '<tr>';
+                columns.forEach(col => {
+                    let value = row[col] === null || row[col] === undefined ? 'NULL' : row[col];
+                    
+                    // Special handling for title column - make it clickable if _link exists
+                    if (col === 'title' && row['_link'] && value !== 'NULL' && value !== '') {
+                        html += `<td class="link-cell"><a href="${row['_link']}" target="_blank">${value}</a></td>`;
+                    } else {
+                        html += `<td>${value}</td>`;
+                    }
+                });
+                html += '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        function displayError(message, container) {
+            container.innerHTML = `<div class="error-message"><strong>Error:</strong> ${message}</div>`;
+        }
+
+        function clearQuery() {
+            document.getElementById('sqlQuery').value = '';
+            document.getElementById('sqlResults').innerHTML = '';
+        }
+
+        function setQuery(query) {
+            document.getElementById('sqlQuery').value = query;
+        }
+
+        function scrollToProjects() {
+            document.getElementById('projects').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+
+        // Execute default query on load
+        window.onload = function() {
+            executeQuery();
+        };
+    </script>
+</body>
+</html>
