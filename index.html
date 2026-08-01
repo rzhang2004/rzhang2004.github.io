@@ -134,6 +134,14 @@
       color:var(--muted);
     }
 
+    .item .date{
+      font-family:var(--mono);
+      font-size:12px;
+      letter-spacing:.04em;
+      color:var(--muted);
+      margin-top:4px;
+    }
+
     .tags{
       margin-top:10px;
       display:flex;
@@ -184,32 +192,71 @@
         <h2>Work Experience</h2>
 
         <div class="item">
-          <b>Technology Intern - Starwood Capital Group (Incoming)</b>
+          <b>Technology Intern - Starwood Capital Group</b>
+          <p class="date">June 2026 - July 2026</p>
           <p>
-            Spring 2026 technology internship in the real estate private equity industry.
-          </p>
-        </div>
-
-        <div class="item">
-          <b>Data Science Intern - AIN Ventures</b>
-          <p>
-            Built ML model and accompanying Python library to classify startup funding performance into buckets based off of various data sources.
-            Achieved 96% accuracy, a significant improvement over previous models. Also developed LLM agents (Gemini) to automate data collection and analysis.
+            Developed a REIT tracking web app to support real estate research and built dashboard solutions to monitor data recency and export Snowflake data.
+            Built ETL pipelines to track daily per-person Claude token spending for an AI budgeting dashboard, and documented standard practices for API-based data ingestion.
           </p>
           <div class="tags">
             <span class="tag">Python</span>
+            <span class="tag">SQL</span>
+            <span class="tag">Snowflake</span>
             <span class="tag">Git</span>
           </div>
         </div>
 
         <div class="item">
-          <b>Research Assistant - University of Texas</b>
+          <b>Undergraduate Teaching Assistant - Northwestern University</b>
+          <p class="date">March 2026 - present</p>
           <p>
-            Wrote Python scripts to analyze and visualize data from special metabolomic experiments, decreasing data processing time from 6+ hours to only 10 minutes.
+            TA for Data Structures and Algorithms; coordinated with other TAs and the professor, hosted live coding examples and office hours.
+          </p>
+        </div>
+
+        <div class="item">
+          <b>Incoming Data Science Intern - Chicago Transit Authority</b>
+          <p class="date">September 2026 - December 2026</p>
+          <p>
+            Upcoming fall 2026 internship focused on dashboarding and machine learning.
+          </p>
+        </div>
+
+        <div class="item">
+          <b>Data Science Intern - AIN Ventures</b>
+          <p class="date">October 2025 - January 2026</p>
+          <p>
+            Built a machine learning pipeline to help predict startup funding outcomes, and developed LLM agents to automate feature extraction from unstructured data like pitch decks and patents.
           </p>
           <div class="tags">
             <span class="tag">Python</span>
-            <span class="tag">Excel</span>
+            <span class="tag">Machine Learning</span>
+            <span class="tag">LLM Agents</span>
+          </div>
+        </div>
+
+        <div class="item">
+          <b>Data for Good Hackathon - JPMorgan Chase</b>
+          <p class="date">October 2025</p>
+          <p>
+            Collaborated in a small team over a weekend to analyze workforce data and present actionable insights to non-technical stakeholders.
+          </p>
+          <div class="tags">
+            <span class="tag">Python</span>
+            <span class="tag">Machine Learning</span>
+          </div>
+        </div>
+
+        <div class="item">
+          <b>Research Assistant - University of Texas Health Science Center</b>
+          <p class="date">June 2025 - August 2025</p>
+          <p>
+            Developed a Python program to automate processing of raw spatial metabolite data, reducing wait time from 6+ hours to 10 minutes.
+            Used Tableau and matplotlib for data visualization and wrote SQL queries for data management. Invited for an oral presentation of the abstract, "Integrated Spatial and Plasma Metabolomics Reveals Circulating Biomarkers of Tissue Injury in Diabetic Kidney Disease" (2nd author), at American Society of Nephrology's Kidney Week 2026.
+          </p>
+          <div class="tags">
+            <span class="tag">Python</span>
+            <span class="tag">SQL</span>
             <span class="tag">Tableau</span>
           </div>
         </div>
@@ -252,40 +299,32 @@
       <section>
         <h2>Musical Activities</h2>
         <div class="item">
-          <b>Music Academy of the West - 2026</b>
-          <p>
-            Invited to attend Music Academy of the West's summer fellowship program in Santa Barbara, California.
-          </p>
+          <b>Chicago Civic Orchestra</b>
+          <p class="date">2026 to present</p>
         </div>
         <div class="item">
-          <b>Lucerne Festival Academy 2025</b>
-          <p>
-            Performed in the Lucerne Festival Academy under the mentorship of renowned conductors and musicians, participating in rehearsals and concerts that explore contemporary classical music.
-          </p>
+          <b>Lucerne Festival Forward</b>
+          <p class="date">2026</p>
         </div>
         <div class="item">
-          <b>National Arts Centre Orchestra - Mentorship Program 2025</b>
-          <p>
-            Attended National Arts Centre Orchestra's mentorship program, performing alongside and receiving mentorship from members of the orchestra.
-          </p>
+          <b>Lucerne Festival Academy</b>
+          <p class="date">2025</p>
         </div>
         <div class="item">
-          <b>New York String Orchestra Seminar - 2024</b>
-          <p>
-            Performed in New York String Orchestra Seminar in 2024.
-          </p>
+          <b>National Arts Centre Orchestra - Mentorship Program</b>
+          <p class="date">2025</p>
         </div>
         <div class="item">
-          <b>Aspen Music Festival - 2023, 2024</b>
-          <p>
-            Performed in Aspen Chamber Symphony as a Viola Fellow in 2023 and 2024.
-          </p>
+          <b>New York String Orchestra Seminar</b>
+          <p class="date">2024</p>
         </div>
         <div class="item">
-          <b>National Youth Orchestra of the United States of America - 2022</b>
-          <p>
-            Participated in the NYO-USA 2022 European tour as Assistant Principal violist.
-          </p>
+          <b>Aspen Music Festival</b>
+          <p class="date">2023, 2024</p>
+        </div>
+        <div class="item">
+          <b>National Youth Orchestra of the United States of America</b>
+          <p class="date">2022</p>
         </div>
       </section>
 
